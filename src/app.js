@@ -1,22 +1,27 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import Dexie from 'dexie';
-import glob from 'glob';
-import denodeify from 'denodeify';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import promiseMiddleware from 'redux-promise';
+import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
+import { devTools, persistState } from 'redux-devtools';
+import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { reducer } from './reducers';
 import { listFiles } from './actions';
+import { initAppDir, loadConfig } from './init_helper';
 import App from './containers/app';
 
 let fs = global.require('fs');
 let path = global.require('path');
-let stat = denodeify(fs.stat);
 
 let logger = createLogger();
-let createStoreWithMiddleware = applyMiddleware(promiseMiddleware, logger)(createStore);
-let store = createStoreWithMiddleware(reducer, {files: []});
+let createStoreWithMiddleware = compose(
+  applyMiddleware(thunk, promiseMiddleware, logger),
+  devTools(),
+  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
+)(createStore);
+let store = createStoreWithMiddleware(reducer);
 
 var db = new Dexie("blackalbum");
 db.version(1).stores({
@@ -25,29 +30,23 @@ db.version(1).stores({
 
 db.open();
 
-// glob("/mnt/bacchus_data1/files2/**/*.{mkv,avi}", (er, files) => {
-//   for (let file of files) {
-//     stat(file).then(function(stat) {
-//       let data = {
-//         basename: path.basename(file),
-//         fullpath: file,
-//         filesize: stat.size,
-//         ctime: stat.ctime
-//       };
-//       db.files.add(data);
-//     });
-//   }
-// });
-
 global.db = db;
 
+initAppDir();
+global.config = loadConfig();
 
 document.addEventListener('DOMContentLoaded', () => {
   let rootEl = document.getElementById('main');
   React.render(
-    <Provider store={store}>
-      {() => <App />}
-    </Provider>,
+    <div>
+      <Provider store={store}>
+        {() => <App />}
+      </Provider>
+      <DebugPanel top right bottom>
+        <DevTools store={store} monitor={LogMonitor} />
+      </DebugPanel>
+    </div>
+    ,
     rootEl
   );
   store.dispatch(listFiles());

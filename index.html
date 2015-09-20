@@ -5,13 +5,17 @@
     <link rel="stylesheet" href="stylesheets/style.css" type="text/css" media="screen" charset="utf-8" />
   </head>
   <body>
+    <header>
+      <h1>BlackAlbum</h1>
+    </header>
+
+    <div id="main">
+    </div>
+
     <!-- build:remove -->
     <!-- Connect to server process -->
     <script>require('electron-connect').client.create()</script> 
     <!-- end:build -->
     <script>require('./build/app');</script>
-
-    <div id="main">
-    </div>
   </body>
 </html>
