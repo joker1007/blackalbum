@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>Hello World!</title>
-    <link rel="stylesheet" href="stylesheets/style.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="../stylesheets/style.css" type="text/css" media="screen" charset="utf-8" />
   </head>
   <body>
     <header>
@@ -12,10 +12,9 @@
     <div id="main">
     </div>
 
-    <!-- build:remove -->
-    <!-- Connect to server process -->
+    <!-- @if NODE_ENV='development' -->
     <script>require('electron-connect').client.create()</script> 
-    <!-- end:build -->
-    <script>require('./build/app');</script>
+    <!-- @endif -->
+    <script>require('./app');</script>
   </body>
 </html>

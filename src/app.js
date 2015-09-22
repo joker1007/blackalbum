@@ -5,8 +5,6 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
-import { devTools, persistState } from 'redux-devtools';
-import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { reducer } from './reducers';
 import { listFiles } from './actions';
 import { initAppDir, loadConfig } from './init_helper';
@@ -15,13 +13,18 @@ import Root from './containers/root';
 let fs = global.require('fs');
 let path = global.require('path');
 
+let middlewares = [thunk, promiseMiddleware];
+
+global.production = true;
+// @if NODE_ENV='development'
+import { devTools, persistState } from 'redux-devtools';
+import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
+global.production = false;
+
 let logger = createLogger();
-let createStoreWithMiddleware = compose(
-  applyMiddleware(thunk, promiseMiddleware, logger),
-  devTools(),
-  persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
-)(createStore);
-let store = createStoreWithMiddleware(reducer);
+middlewares.push(logger);
+// @endif
+
 
 var db = new Dexie("blackalbum");
 db.version(1).stores({
@@ -35,20 +38,43 @@ global.db = db;
 initAppDir();
 global.config = loadConfig();
 
+if (!global.production) {
+  var createStoreWithMiddleware = compose(
+    applyMiddleware(...middlewares),
+    devTools(),
+    persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
+  )(createStore);
+} else {
+  var createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
+}
+let store = createStoreWithMiddleware(reducer);
+
 document.addEventListener('DOMContentLoaded', () => {
   let rootEl = document.getElementById('main');
-  React.render(
-    <div>
-      <Provider store={store}>
-        {() => <Root />}
-      </Provider>
-      <DebugPanel top right bottom>
-        <DevTools store={store} monitor={LogMonitor} />
-      </DebugPanel>
-    </div>
-    ,
-    rootEl
-  );
+  if (!global.production) {
+    React.render(
+      <div>
+        <Provider store={store}>
+          {() => <Root />}
+        </Provider>
+        <DebugPanel top right bottom>
+          <DevTools store={store} monitor={LogMonitor} />
+        </DebugPanel>
+      </div>
+      ,
+      rootEl
+    );
+  } else {
+    React.render(
+      <div>
+        <Provider store={store}>
+          {() => <Root />}
+        </Provider>
+      </div>
+      ,
+      rootEl
+    );
+  }
   store.dispatch(listFiles());
 });
 

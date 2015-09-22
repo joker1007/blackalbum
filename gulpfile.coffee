@@ -4,15 +4,26 @@ browserify = require('browserify')
 babelify   = require('babelify')
 pkg        = require(__dirname + '/package.json')
 path       = require('path')
+process    = require('process')
+_          = require('lodash')
 
 electron = require('electron-connect').server.create()
+packager = require('electron-packager')
 
-gulp.task 'build', ['sass', 'compile'], ->
+env = process.env.NODE_ENV || "development"
+VERSION = "0.0.1"
+
+isProduction = ->
+  env == "production"
+
+gulp.task 'build', ['html', 'sass', 'compile'], ->
 
 gulp.task 'compile', ->
   gulp.src('src/**/*.{js,jsx}')
+    .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({optional: ["runtime"]}))
+    .pipe(plugins.if(isProduction, plugins.uglify()))
     .on('error', plugins.util.log)
     .on('error', plugins.notify.onError((err) -> {title: "Babel Compile (Error)", message: "Error: #{err}"}))
     .on('error', -> this.emit('end'))
@@ -33,10 +44,37 @@ gulp.task 'sass', ->
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('stylesheets'))
 
+gulp.task 'html', ->
+  gulp.src('src/**/*.html')
+    .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
+    .pipe(gulp.dest('build'))
+
+packageConfig = {
+  name: "BlackAlbum"
+  dir: "."
+  out: "dist"
+  arch: "x64"
+  version: "0.33.1"
+  prune: true
+  ignore: /(gulpfile\.coffee|src|sass|.*\.map)/
+  asar: true
+  overwrite: true
+  "app-version": VERSION
+}
+gulp.task 'package:mac', ['build'], (done) ->
+  packager(_.extend({}, packageConfig, platform: "darwin"), (err, path) ->
+    done()
+  )
+gulp.task 'package:linux', ['build'], (done) ->
+  packager(_.extend({}, packageConfig, platform: "linux"), (err, path) ->
+    done()
+  )
+gulp.task 'package', ['package:mac', 'package:linux']
 
 gulp.task 'watch', ['build'], ->
   electron.start()
   gulp.watch('src/**/*.{js,jsx}', ['compile'])
+  gulp.watch('src/**/*.{html}', ['html'])
   gulp.watch('sass/**/*.{sass,scss}', ['sass'])
   gulp.watch('main.js', electron.restart)
   gulp.watch(['index.html', 'build/**/*.{html,js,css}', 'stylesheets/**/*.css'], electron.reload)
