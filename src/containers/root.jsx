@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import FileComponent from './file';
-import Updating from './updating';
+import FileComponent from '../components/file';
+import Updating from '../components/updating';
 import AppMenu from './menu';
 
-class App extends Component {
+class Root extends Component {
   render() {
     const { dispatch, files, updating, updatingFiles, updatedFiles } = this.props;
 
@@ -31,7 +31,7 @@ function select(state) {
   };
 }
 
-App.propTypes = {
+Root.propTypes = {
   files: PropTypes.arrayOf(PropTypes.shape({
     basename: PropTypes.string.isRequired,
     fullpath: PropTypes.string.isRequired,
@@ -42,4 +42,4 @@ App.propTypes = {
   updatedFiles: PropTypes.arrayOf(PropTypes.string),
 };
 
-export default connect(select)(App);
+export default connect(select)(Root);

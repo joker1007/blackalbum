@@ -10,7 +10,7 @@ import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
 import { reducer } from './reducers';
 import { listFiles } from './actions';
 import { initAppDir, loadConfig } from './init_helper';
-import App from './containers/app';
+import Root from './containers/root';
 
 let fs = global.require('fs');
 let path = global.require('path');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   React.render(
     <div>
       <Provider store={store}>
-        {() => <App />}
+        {() => <Root />}
       </Provider>
       <DebugPanel top right bottom>
         <DevTools store={store} monitor={LogMonitor} />
