@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
+import _ from 'lodash';
+import { updateSearchKeyword } from '../actions';
 import Header from '../components/header';
 import FileComponent from '../components/file';
 import Updating from '../components/updating';
@@ -7,7 +9,7 @@ import AppMenu from './menu';
 
 class Root extends Component {
   render() {
-    const { dispatch, files, updating, updatingFiles, updatedFiles } = this.props;
+    const { dispatch, files, updating, updatingFiles, updatedFiles, searchKeyword } = this.props;
 
     const fileComponents = files.map(f => {
       return <FileComponent key={f.id} file={f} />;
@@ -15,21 +17,37 @@ class Root extends Component {
 
     return (
       <div>
-        <Header />
+        <Header searchKeyword={searchKeyword} searchFormChangeHandler={this.searchFormChangeHandler.bind(this)} />
         <AppMenu />
         <Updating updating={updating} updatingFiles={updatingFiles} updatedFiles={updatedFiles} />
         {fileComponents}
       </div>
     );
   }
+
+  searchFormChangeHandler(keyword) {
+    const { dispatch } = this.props;
+    dispatch(updateSearchKeyword(keyword));
+  }
 }
 
 function select(state) {
+  const {updating, updatingFiles, updatedFiles, searchKeyword } = state;
+
+  let files = null;
+  if (_.isEmpty(searchKeyword)) {
+    files = state.files;
+  } else {
+    files = _.filter(state.files, f => {
+      return f.basename.includes(searchKeyword);
+    });
+  }
   return {
-    files: state.files,
-    updating: state.updating,
-    updatingFiles: state.updatingFiles,
-    updatedFiles: state.updatedFiles,
+    files,
+    updating,
+    updatingFiles,
+    updatedFiles,
+    searchKeyword,
   };
 }
 

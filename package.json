@@ -44,6 +44,7 @@
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
     "react": "^0.13.3",
+    "react-debounce-input": "^1.1.1",
     "react-lazy-load": "^1.0.4",
     "react-redux": "^2.1.2",
     "redux": "^3.0.0",

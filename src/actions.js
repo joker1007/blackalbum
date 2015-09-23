@@ -13,6 +13,7 @@ export const LIST_FILES = 'LIST_FILES';
 export const UPDATE_DB_REQUEST = 'UPDATE_DB_REQUEST';
 export const UPDATE_FINISH_ALL = 'UPDATE_FINISH_ALL';
 export const UPDATE_FINISH = 'UPDATE_FINISH';
+export const UPDATE_SEARCH_KEYWORD = 'UPDATE_SEARCH_KEYWORD';
 
 export let listFiles = createAction(LIST_FILES, async () => {
   let files = await global.db.files.orderBy('basename').toArray();
@@ -71,3 +72,6 @@ async function addFile(f) {
   return mediaFile.createThumbnail({ count, size });
 }
 
+export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
+  return { keyword };
+});
