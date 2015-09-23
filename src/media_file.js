@@ -174,7 +174,7 @@ export default class MediaFile {
     return _.extend({
       basename: this.basename,
       fullpath: this.fullpath,
-      fileseize: this.filesize,
+      filesize: this.filesize,
       ctime: this.ctime,
     }, videoInfo, audioInfo);
   }
