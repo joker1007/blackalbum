@@ -25,19 +25,19 @@ export default class FileComponent extends Component {
           <div className="info">
             <table>
               <tr>
-                <td>Duration</td><td>{file.durationStr}</td>
+                <td className="info--name">Duration:</td><td>{file.durationStr}</td>
               </tr>
               <tr>
-                <td>VCodec</td><td>{file.vcodec}</td>
+                <td className="info--name">VCodec:</td><td>{file.vcodec}</td>
               </tr>
               <tr>
-                <td>ACodec</td><td>{file.acodec}</td>
+                <td className="info--name">ACodec:</td><td>{file.acodec}</td>
               </tr>
               <tr>
-                <td>Res</td><td>{file.resolution}</td>
+                <td className="info--name">Res:</td><td>{file.resolution}</td>
               </tr>
               <tr>
-                <td>Size</td><td>{file.filesize}</td>
+                <td className="info--name">Size:</td><td>{file.filesize.toLocaleString()} Byte</td>
               </tr>
             </table>
           </div>
