@@ -28,7 +28,7 @@ middlewares.push(logger);
 
 var db = new Dexie("blackalbum");
 db.version(1).stores({
-  files: "++id,basename,&fullpath,filesize,ctime"
+  files: "++id,basename,&fullpath,filesize,ctime,width,height,duration,vcodec,vBitRate,acodec,aBitRate,sampleRate"
 });
 
 db.open();

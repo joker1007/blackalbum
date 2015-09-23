@@ -74,7 +74,7 @@ gulp.task 'package', ['package:mac', 'package:linux']
 gulp.task 'watch', ['build'], ->
   electron.start()
   gulp.watch('src/**/*.{js,jsx}', ['compile'])
-  gulp.watch('src/**/*.{html}', ['html'])
+  gulp.watch('src/**/*.html', ['html'])
   gulp.watch('sass/**/*.{sass,scss}', ['sass'])
   gulp.watch('main.js', electron.restart)
   gulp.watch(['index.html', 'build/**/*.{html,js,css}', 'stylesheets/**/*.css'], electron.reload)

@@ -8,17 +8,41 @@ export default class FileComponent extends Component {
   render() {
     const { file } = this.props;
     const thumbnails = file.thumbnails.map(th => {
-      return <img className="thumb" key={th} src={th} />
+      return (
+        <a href="" onClick={this.onClickBasename.bind(this)}>
+          <img className="thumb" key={th} src={th} />
+        </a>
+      );
     });
     return (
       <div key={file.id} className="entry">
-        <div>
-          <LazyLoad>
-            <a href="" onClick={this.onClickBasename.bind(this)}>
+        <div className="entry--thumbnails_and_info">
+          <div className="thumbnails">
+            <LazyLoad>
               {thumbnails}
-            </a>
-          </LazyLoad>
+            </LazyLoad>
+          </div>
+          <div className="info">
+            <table>
+              <tr>
+                <td>Duration</td><td>{file.durationStr}</td>
+              </tr>
+              <tr>
+                <td>VCodec</td><td>{file.vcodec}</td>
+              </tr>
+              <tr>
+                <td>ACodec</td><td>{file.acodec}</td>
+              </tr>
+              <tr>
+                <td>Res</td><td>{file.resolution}</td>
+              </tr>
+              <tr>
+                <td>Size</td><td>{file.filesize}</td>
+              </tr>
+            </table>
+          </div>
         </div>
+
         <a href="" onClick={this.onClickBasename.bind(this)}>{file.basename}</a>
       </div>
     );
@@ -35,7 +59,6 @@ export default class FileComponent extends Component {
 FileComponent.propTypes = {
   file: PropTypes.shape({
     basename: PropTypes.string.isRequired,
-    fullpath: PropTypes.string.isRequired,
-    filesize: PropTypes.number.isRequired
+    fullpath: PropTypes.string.isRequired
   })
 };

@@ -64,8 +64,9 @@ async function addFile(f) {
     filesize: s.size,
     ctime: s.ctime
   };
-  global.db.files.add(data);
   let mediaFile = new MediaFile(data)
+  let dbData = await mediaFile.toDbData();
+  global.db.files.add(dbData);
   let { count, size } = global.config.thumbnail
   return mediaFile.createThumbnail({ count, size });
 }
