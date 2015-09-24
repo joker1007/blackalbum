@@ -50,8 +50,8 @@ export default class MediaFile {
     sampleRate
   }) {
     this.id         = id;
-    this.basename   = basename;
-    this.fullpath   = fullpath;
+    this.basename   = basename.normalize();
+    this.fullpath   = fullpath.normalize();
     this.filesize   = filesize;
     this.ctime      = ctime;
     this.width      = width;
