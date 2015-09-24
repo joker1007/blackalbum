@@ -8,9 +8,15 @@ export default class FileComponent extends Component {
   render() {
     const { file } = this.props;
     const thumbnails = file.thumbnails.map(th => {
+      let style = {
+        backgroundColor: "black",
+        backgroundImage: `url("${th}")`,
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "contain",
+      };
       return (
-        <a href="" onClick={this.onClickBasename.bind(this)}>
-          <img className="thumb" key={th} src={th} />
+        <a style={style} href="" key={th} onClick={this.onClickBasename.bind(this)}>
         </a>
       );
     });
@@ -18,7 +24,7 @@ export default class FileComponent extends Component {
       <div key={file.id} className="entry">
         <div className="entry--thumbnails_and_info">
           <div className="thumbnails">
-            <LazyLoad>
+            <LazyLoad height={Math.round(global.config.thumbnail.size / 4 * 3).toString()}>
               {thumbnails}
             </LazyLoad>
           </div>
