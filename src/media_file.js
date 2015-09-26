@@ -2,6 +2,7 @@ let fs = global.require('fs');
 let path = global.require('path');
 let fsExtra = global.require('fs-extra');
 let childProcess = global.require('child_process');
+import { Record } from 'immutable';
 import _ from 'lodash';
 import ffmpeg from 'fluent-ffmpeg';
 import denodeify from 'denodeify';
@@ -33,37 +34,21 @@ function ensureDir(dirPath) {
   });
 }
 
-export default class MediaFile {
-  constructor({
-    id,
-    basename,
-    fullpath,
-    filesize,
-    ctime,
-    width,
-    height,
-    duration,
-    vcodec,
-    vBitRate,
-    acodec,
-    aBitRate,
-    sampleRate
-  }) {
-    this.id         = id;
-    this.basename   = basename.normalize();
-    this.fullpath   = fullpath.normalize();
-    this.filesize   = filesize;
-    this.ctime      = ctime;
-    this.width      = width;
-    this.height     = height;
-    this.duration   = duration;
-    this.vcodec     = vcodec;
-    this.vBitRate   = vBitRate;
-    this.acodec     = acodec;
-    this.aBitRate   = aBitRate;
-    this.sampleRate = sampleRate;
-  }
-
+export default class MediaFile extends Record({
+  id: null,
+  basename: null,
+  fullpath: null,
+  filesize: null,
+  ctime: null,
+  width: null,
+  height: null,
+  duration: null,
+  vcodec: null,
+  vBitRate: null,
+  acodec: null,
+  aBitRate: null,
+  sampleRate: null
+}) {
   get basenameWithoutExtension() {
     return path.basename(this.basename, path.extname(this.basename));
   }

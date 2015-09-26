@@ -35,7 +35,12 @@ gulp.task 'compile', ->
 gulp.task 'sass', ->
   gulp.src('sass/**/*.{sass,scss}')
     .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.sass({outputStyle: 'compressed'}))
+    .pipe(plugins.sass({
+      outputStyle: 'compressed'
+      includePaths: [
+        './node_modules'
+      ]
+    }))
     .on('error', plugins.util.log)
     .on('error', plugins.notify.onError((err) -> {title: "Sass Compile (Error)", message: "Error: #{err}"}))
     .on('error', -> this.emit('end'))

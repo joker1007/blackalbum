@@ -1,3 +1,5 @@
+@import "react-select/dist/default"
+
 body
   :padding-left 20px
   :padding-right 20px
@@ -14,24 +16,46 @@ header
   :position fixed
   :top 0px
   :width 100%
+  :height 36px
   :border-bottom solid 1px #333
+  :vertical-align middle
+  :display flex
+  :align-items center
 
   h1, h2, h3
     :display inline-block
     :margin-top 2px
     :margin-bottom 2px
     :margin-right 4px
+    :flex 0 0 100px
 
   .search
     :width 240px
+    :flex 0 0 240px
+    :height 24px
+    :margin-right 10px
+    :display block
+
+  .sort
+    :width 240px
+    :flex 0 0 240px
+    :display block
+
+.unselectable
+  :-webkit-user-select none;
+.selectable
+  :-webkit-user-select auto;
 
 #main
-  padding-top: 10px
+  padding-top: 40px
 
 .movie, .book, .entry
   :border solid 1px #888
   :margin-top 10px
   :padding 6px
+
+  &.selected
+    :background-color #666;
 
   .entry--thumbnails_and_info
     :display flex

@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 
 export default class Updating extends Component {
   render() {
@@ -6,7 +7,7 @@ export default class Updating extends Component {
     if (updating) {
       return (
         <div>
-          updating {updatedFiles.length} of {updatingFiles.length} files.
+          updating {updatedFiles.size} of {updatingFiles.size} files.
         </div>
       );
     } else {
@@ -17,6 +18,6 @@ export default class Updating extends Component {
 
 Updating.propTypes = {
   updating: PropTypes.bool.isRequired,
-  updatingFiles: PropTypes.arrayOf(PropTypes.string),
-  updatedFiles: PropTypes.arrayOf(PropTypes.string),
+  updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
+  updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
 };
