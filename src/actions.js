@@ -39,7 +39,7 @@ export const CTIME_DESC    = 'CTIME_DESC';
 export let listFiles = createAction(LIST_FILES, async () => {
   const files = await global.db.files.orderBy('basename').toArray();
   const data = _.map(files, f => {
-    return [f.id, new MediaFile(f)];
+    return [f.id, new MediaFile.build(f)];
   });
   const mediaFiles = new OrderedMap(data);
   return { files: mediaFiles };
@@ -102,7 +102,7 @@ async function addFile(f) {
     filesize: s.size,
     ctime: s.ctime
   };
-  let mediaFile = new MediaFile(data)
+  let mediaFile = MediaFile.build(data)
   let dbData = await mediaFile.toDbData();
   global.db.files.add(dbData);
   let { count, size } = global.config.thumbnail

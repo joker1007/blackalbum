@@ -1,38 +1,46 @@
 let fs = global.require('fs');
 let path = global.require('path');
-let fsExtra = global.require('fs-extra');
 let childProcess = global.require('child_process');
 import { Record } from 'immutable';
 import _ from 'lodash';
 import ffmpeg from 'fluent-ffmpeg';
 import denodeify from 'denodeify';
-import moment from 'moment';
+import Zip from 'adm-zip';
+import Jimp from 'jimp';
+import { sprintf } from 'sprintf-js';
 import { parse } from 'shell-quote';
+import { fsAccess, ensureDir} from './helpers/path_helper';
 
-function fsAccess(filePath) {
-  return new Promise((resolve, reject) => {
-    fs.access(filePath, (err) => {
-      if (err) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
+const MOVIE_EXTENSIONS = [
+  "3g2",
+  "3gp",
+  "asf",
+  "avi",
+  "divx",
+  "flv",
+  "m2v",
+  "m4v",
+  "mkv",
+  "mov",
+  "mp2",
+  "mp4",
+  "mpe",
+  "mpeg",
+  "mpg",
+  "nsv",
+  "ogm",
+  "qt",
+  "rm",
+  "rmvb",
+  "vob",
+  "wmv",
+];
 
-function ensureDir(dirPath) {
-  return new Promise((resolve, reject) => {
-    fsExtra.ensureDir(dirPath, (err) => {
-      if (err) {
-        console.log(err);
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
+const IMAGE_EXTENSIONS = [
+  "bmp",
+  "jpg",
+  "png",
+]
 
 export default class MediaFile extends Record({
   id: null,
@@ -57,6 +65,10 @@ export default class MediaFile extends Record({
     return path.extname(this.basename).substr(1);
   }
 
+  get isMovie() {
+    return false;
+  }
+
   get thumbnailDir() {
     return path.dirname(path.join(global.config.thumbnail.dir, this.fullpath));
   }
@@ -70,12 +82,11 @@ export default class MediaFile extends Record({
   }
 
   get resolution() {
-    return `${this.width}x${this.height}`;
+    return null;
   }
 
   get durationStr() {
-    let d = moment.utc(this.duration * 1000);
-    return d.format("H:mm:ss");
+    return null;
   }
 
   get mainCommand() {
@@ -104,6 +115,54 @@ export default class MediaFile extends Record({
       [...args, this.fullpath],
       {detached: true}
     );
+  }
+
+  async createThumbnail({ count, size }) {
+    return true;
+  }
+
+  getMediaInfo() {
+    return new Promise((resolve, reject) => {
+      resolve({});
+    });
+  }
+
+  async toDbData() {
+    return {
+      basename: this.basename,
+      fullpath: this.fullpath,
+      filesize: this.filesize,
+      ctime: this.ctime,
+    };
+  }
+}
+
+MediaFile.build = (data) => {
+  const extname = path.extname(data.basename).substr(1);
+  if (_.includes(MOVIE_EXTENSIONS, extname)) {
+    return new MovieFile(data);
+  } else {
+    return new ArchiveFile(data);
+  }
+};
+
+class MovieFile extends MediaFile {
+  get isMovie() {
+    return true;
+  }
+
+  get resolution() {
+    return `${this.width}x${this.height}`;
+  }
+
+  get durationStr() {
+    if (isNaN(this.duration)) {
+      return "NaN";
+    }
+    const hour = Math.floor(this.duration / 3600);
+    const min = Math.floor((this.duration - hour * 3600) / 60);
+    const sec = Math.floor((this.duration - hour * 3600 - min * 60) % 60);
+    return sprintf("%d:%02d:%02d", hour, min, sec);
   }
 
   async createThumbnail({ count, size }) {
@@ -167,6 +226,9 @@ export default class MediaFile extends Record({
       vcodec: videoStream.codec_name,
       vBitRate: parseInt(videoStream.bit_rate),
     }
+    if (isNaN(videoInfo.duration)) {
+      videoInfo.duration = parseInt(info.format.duration);
+    }
     let audioInfo = audioStream === null ? {} : {
       acodec: audioStream.codec_name,
       aBitRate: parseInt(audioStream.bit_rate),
@@ -179,5 +241,63 @@ export default class MediaFile extends Record({
       filesize: this.filesize,
       ctime: this.ctime,
     }, videoInfo, audioInfo);
+  }
+}
+
+class ArchiveFile extends MediaFile {
+  async createThumbnail({ count, size }) {
+    let fsAccessResults = [];
+    for (let i = 1; i <= count; ++i) {
+      fsAccessResults.push(await fsAccess(this.thumbnailPath(i)));
+    }
+    if (_.all(fsAccessResults)) {
+      return false;
+    }
+
+    await ensureDir(this.thumbnailDir);
+    const zip = new Zip(this.fullpath);
+    const imageEntries = _.chain(zip.getEntries())
+      .filter(entry => {
+        return _.includes(IMAGE_EXTENSIONS, path.extname(entry.name).substr(1))
+      }).sortBy('entryName').value();
+    const coverEntry = _.find(imageEntries, entry => {
+      return entry.name.match(/cover/i);
+    });
+
+    const targets = _.chain([coverEntry].concat(imageEntries))
+      .compact()
+      .take(count)
+      .value();
+
+    console.log(targets);
+
+    let results = [];
+    for (let i = 1; i <= count; ++i) {
+      results.push(new Promise((resolve, reject) => {
+        fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
+          if (!hasThumbnail) {
+            zip.readFileAsync(targets[i-1], buf => {
+              if (!buf) {
+                resolve(false);
+              }
+
+              new Jimp(buf, (err, image) => {
+                if (err) {
+                  return resolve(false);
+                }
+                image
+                  .scale(size / image.bitmap.width)
+                  .write(this.thumbnailPath(i));
+
+                resolve(true);
+              });
+            });
+          } else {
+            resolve(false);
+          }
+        });
+      }));
+    }
+    return await Promise.all(results);
   }
 }
