@@ -5,6 +5,16 @@ Movie Media Browser by Electron
 ## Screenshot
 ![blackalbum.png](https://cloud.githubusercontent.com/assets/116996/10122588/7003cb2a-6559-11e5-8755-e1819265a002.png)
 
+## Requirements
+- ffmpegthumbnailer
+- ffprobe
+
+On OSX
+
+```
+brew install ffmpeg ffmpegthumbnailer
+```
+
 ## Usage
 Write config file at `~/.blackalbum/config.json`.
 
