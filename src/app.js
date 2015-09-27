@@ -6,7 +6,6 @@ import promiseMiddleware from 'redux-promise';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 import { reducer } from './reducers';
-import { listFiles } from './actions';
 import { initAppDir, loadConfig } from './helpers/init_helper';
 import Root from './containers/root';
 
@@ -75,6 +74,5 @@ document.addEventListener('DOMContentLoaded', () => {
       rootEl
     );
   }
-  store.dispatch(listFiles());
 });
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { HotKeys } from 'react-hotkeys';
 import _ from 'lodash';
-import { updateSearchKeyword, selectFile, removeFile, setSortOrder } from '../actions';
+import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder } from '../actions';
 import { visibleFilesSelector } from '../selectors';
 import Header from '../components/header';
 import FileComponent from '../components/file';
@@ -13,6 +13,11 @@ import AppMenu from './menu';
 import ContextMenu from './context_menu';
 
 class Root extends Component {
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch(listFiles());
+  }
+
   render() {
     const {
       dispatch,
