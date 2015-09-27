@@ -20,13 +20,17 @@ class Config {
     return Object.keys(this.extensions)
   }
 
-  getCommands(extname) {
+  getAllCommands(extname) {
     return this.extensions[extname]
   }
 
   getCommand(extname) {
-    let commands = this.getCommands(extname);
+    let commands = this.getAllCommands(extname);
     return commands[Object.keys(commands)[0]];
+  }
+
+  getCommandNames(extname) {
+    return Object.keys(this.extensions[extname]);
   }
 }
 

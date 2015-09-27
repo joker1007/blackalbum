@@ -53,6 +53,10 @@ export default class MediaFile extends Record({
     return path.basename(this.basename, path.extname(this.basename));
   }
 
+  get extname() {
+    return path.extname(this.basename).substr(1);
+  }
+
   get thumbnailDir() {
     return path.dirname(path.join(global.config.thumbnail.dir, this.fullpath));
   }
@@ -74,13 +78,26 @@ export default class MediaFile extends Record({
     return d.format("H:mm:ss");
   }
 
+  get mainCommand() {
+    return global.config.getCommand(this.extname);
+  }
+
+  get commands() {
+    return global.config.getAllCommands(this.extname);
+  }
+
   thumbnailPath(index) {
     return path.join(this.thumbnailDir, `${this.basenameWithoutExtension}_${index}.png`)
   }
 
-  execute() {
-    const extname = path.extname(this.basename).substr(1);
-    const [cmd, ...args] = parse(global.config.getCommand(extname));
+  execute(commandName = null) {
+    let cmd, args = null;
+
+    if (commandName) {
+      [cmd, ...args] = parse(this.commands[commandName]);
+    } else {
+      [cmd, ...args] = parse(this.mainCommand);
+    }
 
     childProcess.spawn(
       cmd,

@@ -10,6 +10,7 @@ import Header from '../components/header';
 import FileComponent from '../components/file';
 import Updating from '../components/updating';
 import AppMenu from './menu';
+import ContextMenu from './context_menu';
 
 class Root extends Component {
   render() {
@@ -26,12 +27,14 @@ class Root extends Component {
 
     const keymap = {
       'pressEnter': ['enter', 'return'],
+      'pressShiftEnter': ['shift+enter', 'shift+return'],
       'pressDel': ['del'],
     };
 
     const keyHandlers = {
       'pressEnter': _.debounce(this.playSelected.bind(this), 10),
       'pressDel': _.debounce(this.removeSelected.bind(this), 10),
+      'pressShiftEnter': _.debounce(this.dispatchContextMenu.bind(this), 10),
     };
 
     const fileComponents = files.map(f => {
@@ -54,6 +57,7 @@ class Root extends Component {
             sortSelectChangeHandler={this.changeSortOrder.bind(this)}
           />
           <AppMenu />
+          <ContextMenu {...this.props} />
           <Updating updating={updating} updatingFiles={updatingFiles} updatedFiles={updatedFiles} />
           {fileComponents}
         </div>
@@ -83,6 +87,10 @@ class Root extends Component {
     selectedFiles.forEach(f => {
       dispatch(removeFile(f));
     });
+  }
+
+  dispatchContextMenu() {
+    window.dispatchEvent(new Event('contextmenu'));
   }
 
   changeSortOrder(sortOrder) {
