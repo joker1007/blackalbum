@@ -269,8 +269,6 @@ class ArchiveFile extends MediaFile {
       .take(count)
       .value();
 
-    console.log(targets);
-
     let results = [];
     for (let i = 1; i <= count; ++i) {
       results.push(new Promise((resolve, reject) => {
