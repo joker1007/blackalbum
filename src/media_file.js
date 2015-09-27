@@ -137,15 +137,6 @@ export default class MediaFile extends Record({
   }
 }
 
-MediaFile.build = (data) => {
-  const extname = path.extname(data.basename).substr(1);
-  if (_.includes(MOVIE_EXTENSIONS, extname)) {
-    return new MovieFile(data);
-  } else {
-    return new ArchiveFile(data);
-  }
-};
-
 class MovieFile extends MediaFile {
   get isMovie() {
     return true;
@@ -246,6 +237,7 @@ class MovieFile extends MediaFile {
 
 class ArchiveFile extends MediaFile {
   async createThumbnail({ count, size }) {
+    console.log(`create thumbnail: ${this.fullpath}`);
     let fsAccessResults = [];
     for (let i = 1; i <= count; ++i) {
       fsAccessResults.push(await fsAccess(this.thumbnailPath(i)));
@@ -270,7 +262,7 @@ class ArchiveFile extends MediaFile {
       .value();
 
     let results = [];
-    for (let i = 1; i <= count; ++i) {
+    for (let i = 1; i <= targets.length; ++i) {
       results.push(new Promise((resolve, reject) => {
         fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
           if (!hasThumbnail) {
@@ -281,6 +273,7 @@ class ArchiveFile extends MediaFile {
 
               new Jimp(buf, (err, image) => {
                 if (err) {
+                  console.warn(err);
                   return resolve(false);
                 }
                 image
@@ -299,3 +292,12 @@ class ArchiveFile extends MediaFile {
     return await Promise.all(results);
   }
 }
+
+MediaFile.build = (data) => {
+  const extname = path.extname(data.basename).substr(1);
+  if (_.includes(MOVIE_EXTENSIONS, extname)) {
+    return new MovieFile(data);
+  } else {
+    return new ArchiveFile(data);
+  }
+};
