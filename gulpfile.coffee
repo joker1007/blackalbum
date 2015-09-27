@@ -6,6 +6,7 @@ pkg        = require(__dirname + '/package.json')
 path       = require('path')
 process    = require('process')
 _          = require('lodash')
+del        = require('del')
 
 electron = require('electron-connect').server.create()
 packager = require('electron-packager')
@@ -17,6 +18,9 @@ isProduction = ->
   env == "production"
 
 gulp.task 'build', ['html', 'sass', 'compile'], ->
+
+gulp.task 'clean', (cb) ->
+  del(['dist/**/*', 'build/**/*'], cb)
 
 gulp.task 'compile', ->
   gulp.src('src/**/*.{js,jsx}')
