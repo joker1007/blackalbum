@@ -1,5 +1,5 @@
-let path = require('path');
-let fs = require('fs');
+let path = global.require('path');
+let fs = global.require('fs');
 
 export function getUserHome() {
   return process.env.HOME || process.env.USERPROFILE;
