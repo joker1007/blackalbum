@@ -1,14 +1,15 @@
 import { defaultThumbnailDir } from './helpers/path_helper';
 
 export default class Config {
-  constructor({ directories, extensions, thumbnail }) {
-    this.targetDirectories = directories || [];
-    this.extensions = extensions || {};
-    let {directory, count, size } = thumbnail || {};
-    this.thumbnail = {};
-    this.thumbnail.dir = directory || defaultThumbnailDir;
-    this.thumbnail.count = count || 5;
-    this.thumbnail.size = size || "240";
+  constructor({ directories = [], extensions = {}, thumbnail = {}, filterWords = [] }) {
+    this.targetDirectories = directories;
+    this.extensions = extensions;
+    let {directory = defaultThumbnailDir, count = 5, size = "240" } = thumbnail;
+    this.thumbnail = thumbnail;
+    this.thumbnail.dir = directory;
+    this.thumbnail.count = count;
+    this.thumbnail.size = size;
+    this.filterWords = filterWords.map(w => { return new RegExp(w); });
   }
 
   get targetExtensions() {
