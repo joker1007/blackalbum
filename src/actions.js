@@ -9,7 +9,6 @@ import PromisePool from 'es6-promise-pool';
 let fs = global.require('fs');
 let path = global.require('path');
 let glob = denodeify(_glob);
-let stat = denodeify(fs.stat);
 
 /*
  * Action Names
@@ -39,7 +38,7 @@ export const CTIME_DESC    = 'CTIME_DESC';
 export let listFiles = createAction(LIST_FILES, async () => {
   const files = await global.db.files.orderBy('basename').toArray();
   const data = _.map(files, f => {
-    return [f.id, new MediaFile.build(f)];
+    return [f.id, MediaFile.build(f)];
   });
   const mediaFiles = new OrderedMap(data);
   return { files: mediaFiles };
@@ -84,6 +83,10 @@ export let setSortOrder = createAction(SET_SORT_ORDER, sortOrder => {
   return { sortOrder };
 });
 
+export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
+  return { keyword };
+});
+
 export function updateDb(targetFiles) {
   return async dispatch => {
     const promiseProducer = function * () {
@@ -100,20 +103,15 @@ export function updateDb(targetFiles) {
 }
 
 async function addFile(f) {
-  let s = await stat(f);
-  let data = {
-    basename: path.basename(f),
-    fullpath: f,
-    filesize: s.size,
-    ctime: s.ctime
-  };
-  let mediaFile = MediaFile.build(data)
-  let dbData = await mediaFile.toDbData();
-  global.db.files.add(dbData);
-  let { count, size } = global.config.thumbnail
-  return mediaFile.createThumbnail({ count, size });
+  try {
+    let mediaFile = await MediaFile.buildByFileAsync(f);
+    if (await mediaFile.isPersistedAsync()) {
+      let dbData = await mediaFile.toDbData();
+      global.db.files.add(dbData);
+    }
+    let { count, size } = global.config.thumbnail;
+    return mediaFile.createThumbnail({ count, size });
+  } catch (err) {
+    console.warn(f, err);
+  }
 }
-
-export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
-  return { keyword };
-});

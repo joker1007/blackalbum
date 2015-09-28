@@ -1,8 +1,6 @@
-let fs = global.require('fs');
-let path = global.require('path');
-let childProcess = global.require('child_process');
 import { Record } from 'immutable';
 import _ from 'lodash';
+import ObjectPath from 'object-path';
 import ffmpeg from 'fluent-ffmpeg';
 import denodeify from 'denodeify';
 import Zip from 'adm-zip';
@@ -10,6 +8,11 @@ import Jimp from 'jimp';
 import { sprintf } from 'sprintf-js';
 import { parse } from 'shell-quote';
 import { fsAccess, ensureDir} from './helpers/path_helper';
+
+let fs = global.require('fs');
+let path = global.require('path');
+let childProcess = global.require('child_process');
+let stat = denodeify(fs.stat);
 
 const MOVIE_EXTENSIONS = [
   "3g2",
@@ -63,6 +66,20 @@ export default class MediaFile extends Record({
 
   get extname() {
     return path.extname(this.basename).substr(1);
+  }
+
+  async isPersistedAsync() {
+    try {
+      let result = null;
+      if (this.id) {
+        result = await global.db.files.get(this.id);
+      } else {
+        result = await global.db.files.where("fullpath").equals(this.fullpath);
+      }
+      return !!result;
+    } catch (err) {
+      return false;
+    }
   }
 
   get isMovie() {
@@ -157,32 +174,33 @@ class MovieFile extends MediaFile {
   }
 
   async createThumbnail({ count, size }) {
+    console.log(`create thumbnail: ${this.fullpath}`);
     await ensureDir(this.thumbnailDir);
     let results = [];
     for (let i = 1; i <= count; ++i) {
       results.push(new Promise((resolve, reject) => {
         fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
-          if (!hasThumbnail) {
-            childProcess.execFile(
-              'ffmpegthumbnailer',
-              [
-                "-i", this.fullpath,
-                "-o", this.thumbnailPath(i),
-                "-s", size,
-                "-t", `${Math.round(Math.min(100/(count + 1 - i), 99))}%`,
-              ],
-              (err, stdout, stderr) => {
-                if (err) {
-                  console.log(err);
-                  resolve(false);
-                } else {
-                  resolve(true);
-                }
-              }
-            );
-          } else {
-            resolve(false);
+          if (hasThumbnail) {
+            return resolve();
           }
+          childProcess.execFile(
+            'ffmpegthumbnailer',
+            [
+              "-i", this.fullpath,
+              "-o", this.thumbnailPath(i),
+              "-s", size,
+              "-t", `${Math.round(Math.min(100/(count + 1 - i), 99))}%`,
+            ],
+            { maxBuffer: 400 * 1024 },
+            (err, stdout, stderr) => {
+              if (err) {
+                console.warn(this.fullpath, err);
+                resolve();
+              } else {
+                resolve();
+              }
+            }
+          );
         });
       }));
     }
@@ -191,26 +209,42 @@ class MovieFile extends MediaFile {
 
   getMediaInfo() {
     return new Promise((resolve, reject) => {
-      ffmpeg(this.fullpath).ffprobe((err, data) => {
-        if (err) {
-          console.log(err);
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
+      try {
+        ffmpeg(this.fullpath).ffprobe((err, data) => {
+          if (err) {
+            console.log(err);
+            resolve(null);
+          } else {
+            resolve(data);
+          }
+        });
+      } catch (err) {
+        console.warn(this.fullpath, err);
+        resolve(null);
+      }
     });
   }
 
   async toDbData() {
-    let info = await this.getMediaInfo();
-    let videoStream = _.find(info.streams, stream => {
+    const base = {
+      basename: this.basename,
+      fullpath: this.fullpath,
+      filesize: this.filesize,
+      ctime: this.ctime,
+    };
+    const info = await this.getMediaInfo();
+
+    if (info == null) {
+      return base;
+    }
+
+    const videoStream = _.find(info.streams, stream => {
       return stream.codec_type == "video";
-    });
-    let audioStream = _.find(info.streams, stream => {
+    }) || {};
+    const audioStream = _.find(info.streams, stream => {
       return stream.codec_type == "audio";
-    });
-    let videoInfo = videoStream === null ? {} : {
+    }) || {};
+    const videoInfo = {
       width: videoStream.width,
       height: videoStream.height,
       duration: parseInt(videoStream.duration),
@@ -218,36 +252,29 @@ class MovieFile extends MediaFile {
       vBitRate: parseInt(videoStream.bit_rate),
     }
     if (isNaN(videoInfo.duration)) {
-      videoInfo.duration = parseInt(info.format.duration);
+      videoInfo.duration = parseInt(ObjectPath.get(info, 'format.duration'));
     }
-    let audioInfo = audioStream === null ? {} : {
+    const audioInfo = audioStream === null ? {} : {
       acodec: audioStream.codec_name,
       aBitRate: parseInt(audioStream.bit_rate),
       sampleRate: parseInt(audioStream.sample_rate),
     }
 
-    return _.extend({
-      basename: this.basename,
-      fullpath: this.fullpath,
-      filesize: this.filesize,
-      ctime: this.ctime,
-    }, videoInfo, audioInfo);
+    return _.extend(base, videoInfo, audioInfo);
   }
 }
 
 class ArchiveFile extends MediaFile {
-  async createThumbnail({ count, size }) {
-    console.log(`create thumbnail: ${this.fullpath}`);
-    let fsAccessResults = [];
+  async hasAllThumbnail(count) {
+    let results = [];
     for (let i = 1; i <= count; ++i) {
-      fsAccessResults.push(await fsAccess(this.thumbnailPath(i)));
-    }
-    if (_.all(fsAccessResults)) {
-      return false;
+      results.push(await fsAccess(this.thumbnailPath(i)));
     }
 
-    await ensureDir(this.thumbnailDir);
-    const zip = new Zip(this.fullpath);
+    return _.all(results);
+  }
+
+  getImageEntries(zip, count) {
     const imageEntries = _.chain(zip.getEntries())
       .filter(entry => {
         return _.includes(IMAGE_EXTENSIONS, path.extname(entry.name).substr(1))
@@ -256,40 +283,62 @@ class ArchiveFile extends MediaFile {
       return entry.name.match(/cover/i);
     });
 
-    const targets = _.chain([coverEntry].concat(imageEntries))
+    const chunked = _.chain([coverEntry].concat(imageEntries))
       .compact()
-      .take(count)
+      .chunk(count)
       .value();
 
-    let results = [];
-    for (let i = 1; i <= targets.length; ++i) {
-      results.push(new Promise((resolve, reject) => {
-        fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
-          if (!hasThumbnail) {
+    if (chunked.length >= count) {
+      return _.take(chunked.map(n => _.first(n)), count);
+    } else {
+      return _.first(chunked);
+    }
+  }
+
+  async createThumbnail({ count, size }) {
+    try {
+      console.log(`create thumbnail: ${this.fullpath}`);
+      await ensureDir(this.thumbnailDir);
+      if (await this.hasAllThumbnail(count)) {
+        return;
+      }
+
+      const zip = new Zip(this.fullpath);
+      const targets = this.getImageEntries(zip, count) || [];
+
+      let results = [];
+      for (let i = 1; i <= targets.length; ++i) {
+        results.push(new Promise((resolve, reject) => {
+          fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
+            if (hasThumbnail) {
+              return resolve();
+            }
+
             zip.readFileAsync(targets[i-1], buf => {
               if (!buf) {
-                resolve(false);
+                return resolve(false);
               }
 
               new Jimp(buf, (err, image) => {
                 if (err) {
-                  console.warn(err);
+                  console.warn(this.fullpath, err);
                   return resolve(false);
                 }
                 image
-                  .scale(size / image.bitmap.width)
-                  .write(this.thumbnailPath(i));
+                .scale(size / image.bitmap.width)
+                .write(this.thumbnailPath(i));
 
                 resolve(true);
               });
             });
-          } else {
-            resolve(false);
-          }
-        });
-      }));
+          });
+        }));
+      }
+      return await Promise.race(results);
+    } catch (err) {
+      console.warn(err);
+      throw err;
     }
-    return await Promise.all(results);
   }
 }
 
@@ -301,3 +350,14 @@ MediaFile.build = (data) => {
     return new ArchiveFile(data);
   }
 };
+
+MediaFile.buildByFileAsync = async (filepath) => {
+  let s = await stat(filepath);
+  let data = {
+    basename: path.basename(filepath),
+    fullpath: filepath,
+    filesize: s.size,
+    ctime: s.ctime
+  };
+  return MediaFile.build(data);
+}
