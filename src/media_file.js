@@ -118,6 +118,15 @@ export default class MediaFile extends Record({
     return path.join(this.thumbnailDir, `${this.basenameWithoutExtension}_${index}.png`)
   }
 
+  async hasAllThumbnail(count) {
+    let results = [];
+    for (let i = 1; i <= count; ++i) {
+      results.push(await fsAccess(this.thumbnailPath(i)));
+    }
+
+    return _.all(results);
+  }
+
   execute(commandName = null) {
     let cmd, args = null;
 
@@ -174,37 +183,48 @@ class MovieFile extends MediaFile {
   }
 
   async createThumbnail({ count, size }) {
-    console.log(`create thumbnail: ${this.fullpath}`);
-    await ensureDir(this.thumbnailDir);
-    let results = [];
-    for (let i = 1; i <= count; ++i) {
-      results.push(new Promise((resolve, reject) => {
-        fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
-          if (hasThumbnail) {
-            return resolve();
-          }
-          childProcess.execFile(
-            'ffmpegthumbnailer',
-            [
-              "-i", this.fullpath,
-              "-o", this.thumbnailPath(i),
-              "-s", size,
-              "-t", `${Math.round(Math.min(100/(count + 1 - i), 99))}%`,
-            ],
-            { maxBuffer: 400 * 1024 },
-            (err, stdout, stderr) => {
-              if (err) {
-                console.warn(this.fullpath, err);
-                resolve();
-              } else {
-                resolve();
-              }
+    try {
+      await ensureDir(this.thumbnailDir);
+      if (await this.hasAllThumbnail(count))
+        return;
+
+      console.log(`create thumbnail: ${this.fullpath}`);
+      let results = [];
+      for (let i = 1; i <= count; ++i) {
+        results.push(new Promise((resolve, reject) => {
+          fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
+            if (hasThumbnail) {
+              return resolve();
             }
-          );
-        });
-      }));
+            childProcess.execFile(
+              'ffmpegthumbnailer',
+              [
+                "-i", this.fullpath,
+                "-o", this.thumbnailPath(i),
+                "-s", size,
+                "-t", `${Math.round(Math.min(100/(count + 1 - i), 99))}%`,
+              ],
+              { maxBuffer: 400 * 1024 },
+              (err, stdout, stderr) => {
+                if (err) {
+                  console.warn(this.fullpath, err);
+                  resolve();
+                } else {
+                  resolve();
+                }
+              }
+            );
+          });
+        }));
+      }
+      if (_.isEmpty(results))
+        return;
+
+      await Promise.all(results);
+      return
+    } catch (err) {
+      console.warn(err);
     }
-    return await Promise.all(results);
   }
 
   getMediaInfo() {
@@ -265,15 +285,6 @@ class MovieFile extends MediaFile {
 }
 
 class ArchiveFile extends MediaFile {
-  async hasAllThumbnail(count) {
-    let results = [];
-    for (let i = 1; i <= count; ++i) {
-      results.push(await fsAccess(this.thumbnailPath(i)));
-    }
-
-    return _.all(results);
-  }
-
   getImageEntries(zip, count) {
     const imageEntries = _.chain(zip.getEntries())
       .filter(entry => {
@@ -283,6 +294,9 @@ class ArchiveFile extends MediaFile {
       return entry.name.match(/cover/i);
     });
 
+    if (_.isEmpty(imageEntries))
+        return [];
+
     const chunked = _.chain([coverEntry].concat(imageEntries))
       .compact()
       .chunk(count)
@@ -291,53 +305,59 @@ class ArchiveFile extends MediaFile {
     if (chunked.length >= count) {
       return _.take(chunked.map(n => _.first(n)), count);
     } else {
-      return _.first(chunked);
+      return _.first(chunked) || [];
     }
   }
 
   async createThumbnail({ count, size }) {
     try {
-      console.log(`create thumbnail: ${this.fullpath}`);
       await ensureDir(this.thumbnailDir);
-      if (await this.hasAllThumbnail(count)) {
+      if (await this.hasAllThumbnail(count))
         return;
-      }
+
+      console.log(`create thumbnail: ${this.fullpath}`);
 
       const zip = new Zip(this.fullpath);
-      const targets = this.getImageEntries(zip, count) || [];
+      const targets = this.getImageEntries(zip, count);
+
 
       let results = [];
       for (let i = 1; i <= targets.length; ++i) {
-        results.push(new Promise((resolve, reject) => {
-          fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
-            if (hasThumbnail) {
-              return resolve();
+        let hasThumbnail = await fsAccess(this.thumbnailPath(i));
+        if (hasThumbnail)
+          continue;
+
+        let process = new Promise((resolve, reject) => {
+          zip.readFileAsync(targets[i-1], buf => {
+            if (!buf) {
+              reject();
+            } else {
+              resolve(buf);
             }
-
-            zip.readFileAsync(targets[i-1], buf => {
-              if (!buf) {
-                return resolve(false);
-              }
-
-              new Jimp(buf, (err, image) => {
-                if (err) {
-                  console.warn(this.fullpath, err);
-                  return resolve(false);
-                }
-                image
-                .scale(size / image.bitmap.width)
-                .write(this.thumbnailPath(i));
-
-                resolve(true);
-              });
-            });
           });
-        }));
+        }).then(buf => {
+          new Jimp(buf, (err, image) => {
+            if (err) {
+              console.warn(this.fullpath, err);
+              return resolve(false);
+            }
+            image
+            .scale(size / image.bitmap.width)
+            .write(this.thumbnailPath(i));
+          });
+        }).catch(() => {
+          console.warn(this.fullpath, "cannot read zip entry");
+        });
+
+        results.push(process);
       }
-      return await Promise.race(results);
+      if (_.isEmpty(results))
+        return;
+
+      await Promise.all(results);
+      return;
     } catch (err) {
       console.warn(err);
-      throw err;
     }
   }
 }
