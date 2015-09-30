@@ -16,6 +16,10 @@ export default class Config {
     return Object.keys(this.extensions)
   }
 
+  get entryContainerHeight() {
+    return Math.round(this.thumbnail.size / 4 * 3) + 34;
+  }
+
   getAllCommands(extname) {
     return this.extensions[extname]
   }

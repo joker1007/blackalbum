@@ -21,6 +21,9 @@ export default class FileComponent extends Component {
       selected: this.selected,
       unselectable: true,
     });
+    const entryStyle = {
+      height: (Math.round(global.config.thumbnail.size / 4 * 3) + 20).toString() + "px",
+    };
     const thumbnails = file.thumbnails.map(th => {
       let style = {
         backgroundColor: "black",
@@ -30,17 +33,17 @@ export default class FileComponent extends Component {
         backgroundSize: "contain",
       };
       return (
-        <a style={style} href="" key={th} onClick={this.execute.bind(this)}>
+        <a className="entry--thumbnail" style={style} href="" key={th} onClick={this.execute.bind(this)}>
         </a>
       );
     });
     return (
-      <div key={file.id} className={entryClassNames} onClick={this.selectFile.bind(this)}>
+      <div key={file.id} className={entryClassNames} style={entryStyle} onClick={this.selectFile.bind(this)}>
         <div className="entry--thumbnails_and_info">
           <div className="thumbnails">
-            <LazyLoad height={Math.round(global.config.thumbnail.size / 4 * 3).toString()}>
+            <div style={{height: Math.round(global.config.thumbnail.size / 4 * 3).toString()}}>
               {thumbnails}
-            </LazyLoad>
+            </div>
           </div>
           <div className="info selectable">
             <table>
@@ -63,7 +66,9 @@ export default class FileComponent extends Component {
           </div>
         </div>
 
-        <a className="selectable" href="" onClick={this.execute.bind(this)}>{file.basename}</a>
+        <div className="entry--filename">
+          <a className="selectable" href="" onClick={this.execute.bind(this)}>{file.basename}</a>
+        </div>
       </div>
     );
   }

@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder } from '../actions';
 import { visibleFilesSelector } from '../selectors';
 import Header from '../components/header';
-import FileComponent from '../components/file';
+import FileList from '../components/file_list';
 import Updating from '../components/updating';
 import AppMenu from './menu';
 import ContextMenu from './context_menu';
@@ -42,16 +42,6 @@ class Root extends Component {
       'pressShiftEnter': _.debounce(this.dispatchContextMenu.bind(this), 10),
     };
 
-    const fileComponents = files.map(f => {
-      return (
-        <FileComponent
-          key={f.id}
-          file={f}
-          selectedFiles={selectedFiles}
-          onClickHandler={this.selectFile.bind(this)} />
-      );
-    }).toArray();
-
     return (
       <HotKeys keyMap={keymap} handlers={keyHandlers}>
         <div>
@@ -64,7 +54,10 @@ class Root extends Component {
           <AppMenu />
           <ContextMenu {...this.props} />
           <Updating updating={updating} updatingFiles={updatingFiles} updatedFiles={updatedFiles} />
-          {fileComponents}
+          <FileList
+            files={files}
+            selectedFiles={selectedFiles}
+            onClickHandler={this.selectFile.bind(this)} />
         </div>
       </HotKeys>
     );
