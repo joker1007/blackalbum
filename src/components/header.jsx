@@ -1,11 +1,19 @@
 import React, { Component, PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import Select from 'react-select';
 import DebounceInput from 'react-debounce-input';
 import { FILENAME_ASC, FILENAME_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
 
 export default class Header extends Component {
   render() {
-    const { searchKeyword, sortOrder, sortSelectChangeHandler } = this.props;
+    const {
+      searchKeyword,
+      sortOrder,
+      sortSelectChangeHandler,
+      updating,
+      updatingFiles,
+      updatedFiles
+    } = this.props;
     const options = [
       {value: FILENAME_ASC, label: 'ファイル名 (昇順)'},
       {value: FILENAME_DESC, label: 'ファイル名 (降順)'},
@@ -14,6 +22,13 @@ export default class Header extends Component {
       {value: CTIME_ASC, label: '作成時 (昇順)'},
       {value: CTIME_DESC, label: '作成時 (降順)'},
     ];
+
+    let updatingArea = updating ?
+      <div className="updating">
+        updating {updatedFiles.size} of {updatingFiles.size} files.
+      </div> :
+      null
+
     return (
       <header>
         <h3>BlackAlbum</h3>
@@ -32,6 +47,7 @@ export default class Header extends Component {
             options={options}
             onChange={sortSelectChangeHandler} />
         </div>
+        {updatingArea}
       </header>
     );
   }
@@ -47,4 +63,7 @@ Header.propTypes = {
   searchKeyword: PropTypes.string.isRequired,
   searchFormChangeHandler: PropTypes.func.isRequired,
   sortSelectChangeHandler: PropTypes.func.isRequired,
+  updating: PropTypes.bool.isRequired,
+  updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
+  updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
 };

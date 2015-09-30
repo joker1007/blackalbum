@@ -8,7 +8,6 @@ import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder } 
 import { visibleFilesSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
-import Updating from '../components/updating';
 import AppMenu from './menu';
 import ContextMenu from './context_menu';
 
@@ -50,10 +49,12 @@ class Root extends Component {
             sortOrder={sortOrder}
             searchFormChangeHandler={this.searchFormChangeHandler.bind(this)}
             sortSelectChangeHandler={this.changeSortOrder.bind(this)}
+            updating={updating}
+            updatingFiles={updatingFiles}
+            updatedFiles={updatedFiles}
           />
           <AppMenu />
           <ContextMenu {...this.props} />
-          <Updating updating={updating} updatingFiles={updatingFiles} updatedFiles={updatedFiles} />
           <FileList
             files={files}
             selectedFiles={selectedFiles}
