@@ -29,6 +29,8 @@ export const SET_SORT_ORDER = 'SET_SORT_ORDER';
  */
 export const FILENAME_ASC  = 'FILENAME_ASC';
 export const FILENAME_DESC = 'FILENAME_DESC';
+export const FULLPATH_ASC  = 'FULLPATH_ASC';
+export const FULLPATH_DESC = 'FULLPATH_DESC';
 export const FILESIZE_ASC  = 'FILESIZE_ASC';
 export const FILESIZE_DESC = 'FILESIZE_DESC';
 export const CTIME_ASC     = 'CTIME_ASC';

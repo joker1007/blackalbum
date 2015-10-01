@@ -5,7 +5,7 @@ import { createSelector } from 'reselect';
 import { HotKeys } from 'react-hotkeys';
 import _ from 'lodash';
 import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder } from '../actions';
-import { visibleFilesSelector } from '../selectors';
+import { allSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
 import AppMenu from './menu';
@@ -106,4 +106,4 @@ Root.propTypes = {
   updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
 };
 
-export default connect(visibleFilesSelector)(Root);
+export default connect(allSelector)(Root);

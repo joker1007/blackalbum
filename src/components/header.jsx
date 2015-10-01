@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Select from 'react-select';
 import DebounceInput from 'react-debounce-input';
-import { FILENAME_ASC, FILENAME_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
+import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
 
 export default class Header extends Component {
   render() {
@@ -18,6 +18,8 @@ export default class Header extends Component {
     const options = [
       {value: FILENAME_ASC, label: 'ファイル名 (昇順)'},
       {value: FILENAME_DESC, label: 'ファイル名 (降順)'},
+      {value: FULLPATH_ASC, label: 'フルパス (昇順)'},
+      {value: FULLPATH_DESC, label: 'フルパス (降順)'},
       {value: FILESIZE_ASC, label: 'ファイルサイズ (昇順)'},
       {value: FILESIZE_DESC, label: 'ファイルサイズ (降順)'},
       {value: CTIME_ASC, label: '作成時 (昇順)'},
@@ -57,7 +59,6 @@ export default class Header extends Component {
   }
 
   changeSearchHandler(value) {
-    console.log(value)
     const { searchFormChangeHandler } = this.props;
     searchFormChangeHandler(value);
   }
