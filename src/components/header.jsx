@@ -10,6 +10,7 @@ export default class Header extends Component {
       searchKeyword,
       sortOrder,
       sortSelectChangeHandler,
+      fileCount,
       updating,
       updatingFiles,
       updatedFiles
@@ -47,6 +48,9 @@ export default class Header extends Component {
             options={options}
             onChange={sortSelectChangeHandler} />
         </div>
+        <div className="file-count">
+          {fileCount} files
+        </div>
         {updatingArea}
       </header>
     );
@@ -63,6 +67,7 @@ Header.propTypes = {
   searchKeyword: PropTypes.string.isRequired,
   searchFormChangeHandler: PropTypes.func.isRequired,
   sortSelectChangeHandler: PropTypes.func.isRequired,
+  fileCount: PropTypes.number.isRequired,
   updating: PropTypes.bool.isRequired,
   updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
   updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),

@@ -31,7 +31,13 @@ export default class FileList extends Component {
     });
 
     return (
-      <Infinite className="entries" containerHeight={this.state.displayHeight - 80} elementHeight={global.config.entryContainerHeight}>
+      <Infinite
+        className="entries"
+        containerHeight={this.state.displayHeight - 80}
+        elementHeight={global.config.entryContainerHeight}
+        timeScrollStateLastsForAfterUserScrolls={100}
+        preloadBatchSize={this.state.displayHeight - 80}
+        preloadAdditionalHeight={(this.state.displayHeight - 80) * 2}>
         {this.fileComponents.toArray()}
       </Infinite>
     );

@@ -49,6 +49,7 @@ class Root extends Component {
             sortOrder={sortOrder}
             searchFormChangeHandler={this.searchFormChangeHandler.bind(this)}
             sortSelectChangeHandler={this.changeSortOrder.bind(this)}
+            fileCount={files.size}
             updating={updating}
             updatingFiles={updatingFiles}
             updatedFiles={updatedFiles}
