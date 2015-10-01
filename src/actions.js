@@ -95,7 +95,7 @@ export function updateDb(targetFiles) {
         dispatch(finishUpdate(f))
       }
     }
-    const pool = new PromisePool(promiseProducer, 3)
+    const pool = new PromisePool(promiseProducer, 4)
     await pool.start();
     dispatch(finishAllUpdate());
     dispatch(listFiles());
@@ -105,7 +105,8 @@ export function updateDb(targetFiles) {
 async function addFile(f) {
   try {
     let mediaFile = await MediaFile.buildByFileAsync(f);
-    if (await mediaFile.isPersistedAsync()) {
+    let isPersisted = await mediaFile.isPersistedAsync();
+    if (!isPersisted) {
       let dbData = await mediaFile.toDbData();
       global.db.files.add(dbData);
     }

@@ -74,7 +74,7 @@ export default class MediaFile extends Record({
       if (this.id) {
         result = await global.db.files.get(this.id);
       } else {
-        result = await global.db.files.where("fullpath").equals(this.fullpath);
+        result = await global.db.files.where("fullpath").equals(this.fullpath).first();
       }
       return !!result;
     } catch (err) {
