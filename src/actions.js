@@ -50,7 +50,7 @@ export let requestUpdateDb = createAction(UPDATE_DB_REQUEST, async () => {
     let globbed = await glob(path.join(dir, "**", `*.{${global.config.targetExtensions.join(",")}}`));
     for (let f of globbed) {
       let valid = _.all(global.config.filterWords, w => {
-        return !f.match(w)
+        return !f.normalize().match(w)
       })
       if (valid) {
         files = files.push(f);
