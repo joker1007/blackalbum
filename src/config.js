@@ -1,4 +1,11 @@
 import { defaultThumbnailDir } from './helpers/path_helper';
+import _ from 'lodash';
+import { List } from 'immutable';
+import _glob from 'glob';
+import denodeify from 'denodeify';
+
+let path = global.require('path');
+let glob = denodeify(_glob);
 
 export default class Config {
   constructor({ directories = [], extensions = {}, thumbnail = {}, filterWords = [] }) {
@@ -31,6 +38,22 @@ export default class Config {
 
   getCommandNames(extname) {
     return Object.keys(this.extensions[extname]);
+  }
+
+  async getTargetFiles() {
+    const files = new List().asMutable();
+    for (let dir of this.targetDirectories) {
+      let globbed = await glob(path.join(dir, "**", `*.{${this.targetExtensions.join(",")}}`));
+      for (let f of globbed) {
+        let valid = _.all(this.filterWords, w => {
+          return !f.normalize().match(w);
+        })
+        if (valid) {
+          files.push(f);
+        }
+      }
+    }
+    return files.asImmutable();
   }
 }
 

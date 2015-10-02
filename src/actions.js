@@ -47,18 +47,8 @@ export let listFiles = createAction(LIST_FILES, async () => {
 });
 
 export let requestUpdateDb = createAction(UPDATE_DB_REQUEST, async () => {
-  let files = new List();
-  for (let dir of global.config.targetDirectories) {
-    let globbed = await glob(path.join(dir, "**", `*.{${global.config.targetExtensions.join(",")}}`));
-    for (let f of globbed) {
-      let valid = _.all(global.config.filterWords, w => {
-        return !f.normalize().match(w)
-      })
-      if (valid) {
-        files = files.push(f);
-      }
-    }
-  }
+  const existFiles = await existFilesMap();
+  const files = (await global.config.getTargetFiles()).filterNot(f => existFiles.has(f));
   return { files };
 });
 
@@ -98,9 +88,12 @@ export function updateDb(targetFiles) {
       }
     }
     const pool = new PromisePool(promiseProducer, 4)
-    await pool.start();
-    dispatch(finishAllUpdate());
-    dispatch(listFiles());
+    try {
+      await pool.start();
+    } finally {
+      dispatch(finishAllUpdate());
+      dispatch(listFiles());
+    }
   };
 }
 
@@ -117,4 +110,13 @@ async function addFile(f) {
   } catch (err) {
     console.warn(f, err);
   }
+}
+
+async function existFilesMap() {
+  const map = new Map();
+  const fromDb = await global.db.files.toArray();
+  for (let f of fromDb) {
+    map.set(f.fullpath, true);
+  }
+  return map;
 }
