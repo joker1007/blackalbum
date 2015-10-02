@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/joker1007/blackalbum.png?label=ready&title=Ready)](https://waffle.io/joker1007/blackalbum)
 # Blackalbum
 
 Movie Media Browser by Electron
