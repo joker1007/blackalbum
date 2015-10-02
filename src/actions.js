@@ -90,6 +90,8 @@ export function updateDb(targetFiles) {
     const pool = new PromisePool(promiseProducer, 4)
     try {
       await pool.start();
+    } catch (err) {
+      console.warn(err);
     } finally {
       dispatch(finishAllUpdate());
       dispatch(listFiles());

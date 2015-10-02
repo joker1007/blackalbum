@@ -45,11 +45,12 @@ export default class Config {
     for (let dir of this.targetDirectories) {
       let globbed = await glob(path.join(dir, "**", `*.{${this.targetExtensions.join(",")}}`));
       for (let f of globbed) {
+        let normalized = f.normalize();
         let valid = _.all(this.filterWords, w => {
-          return !f.normalize().match(w);
+          return !normalized.match(w);
         })
         if (valid) {
-          files.push(f);
+          files.push(normalized);
         }
       }
     }
