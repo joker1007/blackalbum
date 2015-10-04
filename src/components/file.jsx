@@ -4,8 +4,8 @@ import React, { Component, PropTypes } from 'react';
 import { parse } from 'shell-quote';
 import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
-import MediaFile from '../media_file';
-import { OrderedMap } from 'immutable';
+import type MediaFile from '../media_file';
+import type { OrderedMap } from 'immutable';
 var childProcess = global.require('child_process');
 var path = global.require('path');
 

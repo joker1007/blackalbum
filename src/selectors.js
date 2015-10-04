@@ -2,7 +2,7 @@
 
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import _ from 'lodash';
-import { OrderedMap } from 'immutable';
+import type { OrderedMap } from 'immutable';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
 const filesSelector = state => state.get("files");
