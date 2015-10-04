@@ -1,19 +1,23 @@
+/* @flow */
+
 import React, { Component, PropTypes } from 'react';
 import { parse } from 'shell-quote';
 import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
+import MediaFile from '../media_file';
+import { OrderedMap } from 'immutable';
 var childProcess = global.require('child_process');
 var path = global.require('path');
 
 export default class FileComponent extends Component {
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: OrderedMap}, nextState: Object): boolean {
     let { file, selectedFiles } = nextProps;
     let selected = !!selectedFiles.get(file.id.toString());
     return (this.file !== file) || (this.selected !== selected);
   }
 
-  render() {
-    const { file, selectedFiles } = this.props;
+  render(): Component {
+    let { file, selectedFiles } = this.props;
     this.file = file;
     this.selected = !!selectedFiles.get(file.id.toString());
     const entryClassNames = classNames({
@@ -73,16 +77,16 @@ export default class FileComponent extends Component {
     );
   }
 
-  execute(e) {
+  execute(e: Event): void {
     e.preventDefault();
-    const { file } = this.props;
+    let { file } = this.props;
 
     file.execute();
   }
 
-  selectFile(e) {
+  selectFile(e: Event): void {
     e.preventDefault();
-    const { file, onClickHandler } = this.props;
+    let { file, onClickHandler } = this.props;
     onClickHandler(file);
   }
 }

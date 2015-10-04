@@ -1,10 +1,13 @@
+/* @flow */
+
 import React, { Component, PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import FileComponent from './file';
 import _ from 'lodash';
 import Infinite from 'react-infinite';
 
 export default class FileList extends Component {
-  constructor(props) {
+  constructor(props: Object) {
     super(props);
     this.state = {displayHeight: window.innerHeight};
   }
@@ -49,7 +52,7 @@ export default class FileList extends Component {
 }
 
 FileList.propTypes = {
-  files: PropTypes.object.isRequired,
-  selectedFiles: PropTypes.object.isRequired,
+  files: ImmutablePropTypes.orderedMap.isRequired,
+  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };

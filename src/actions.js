@@ -1,3 +1,5 @@
+/* @flow */
+
 import { OrderedMap, List } from 'immutable';
 import { createAction } from 'redux-actions';
 import _ from 'lodash';
@@ -79,7 +81,7 @@ export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => 
   return { keyword };
 });
 
-export function updateDb(targetFiles) {
+export function updateDb(targetFiles: List<string>): Function {
   return async dispatch => {
     const promiseProducer = function * () {
       for (let f of targetFiles) {

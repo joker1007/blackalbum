@@ -1,3 +1,5 @@
+/* @flow */
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import Select from 'react-select';
@@ -5,8 +7,8 @@ import DebounceInput from 'react-debounce-input';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
 
 export default class Header extends Component {
-  render() {
-    const {
+  render(): Component {
+    let {
       searchKeyword,
       sortOrder,
       sortSelectChangeHandler,
@@ -58,8 +60,8 @@ export default class Header extends Component {
     );
   }
 
-  changeSearchHandler(value) {
-    const { searchFormChangeHandler } = this.props;
+  changeSearchHandler(value: string) {
+    let { searchFormChangeHandler } = this.props;
     searchFormChangeHandler(value);
   }
 }

@@ -1,3 +1,5 @@
+/* @flow */
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
@@ -13,12 +15,12 @@ import ContextMenu from './context_menu';
 
 class Root extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
+    let { dispatch } = this.props;
     dispatch(listFiles());
   }
 
   render() {
-    const {
+    let {
       dispatch,
       files,
       updating,
@@ -66,24 +68,24 @@ class Root extends Component {
   }
 
   searchFormChangeHandler(keyword) {
-    const { dispatch } = this.props;
+    let { dispatch } = this.props;
     dispatch(updateSearchKeyword(keyword));
   }
 
   selectFile(file) {
-    const { dispatch } = this.props;
+    let { dispatch } = this.props;
     dispatch(selectFile(file));
   }
 
   playSelected(e) {
-    const { selectedFiles } = this.props;
+    let { selectedFiles } = this.props;
     selectedFiles.forEach(f => {
       f.execute();
     });
   }
 
   removeSelected(e) {
-    const { dispatch, selectedFiles } = this.props;
+    let { dispatch, selectedFiles } = this.props;
     selectedFiles.forEach(f => {
       dispatch(removeFile(f));
     });
@@ -94,16 +96,19 @@ class Root extends Component {
   }
 
   changeSortOrder(sortOrder) {
-    const { dispatch } = this.props;
+    let { dispatch } = this.props;
     dispatch(setSortOrder(sortOrder));
   }
 }
 
 Root.propTypes = {
-  files: PropTypes.object.isRequired,
+  files: ImmutablePropTypes.orderedMap.isRequired,
   updating: PropTypes.bool.isRequired,
   updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
   updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
+  searchKeyword: PropTypes.string.isRequired,
+  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
+  sortOrder: PropTypes.string.isRequired,
 };
 
 export default connect(allSelector)(Root);

@@ -1,8 +1,10 @@
+/* @flow */
+
 import Config from '../config';
 import { appDir, configFile, defaultThumbnailDir } from './path_helper';
 let fs = global.require('fs');
 
-export function initAppDir() {
+export function initAppDir(): void {
   if (!fs.existsSync(appDir)) {
     fs.mkdirSync(appDir);
   }
@@ -11,7 +13,7 @@ export function initAppDir() {
   }
 }
 
-export function loadConfig() {
+export function loadConfig(): Config {
   if (fs.existsSync(configFile)) {
     let conf = JSON.parse(fs.readFileSync(configFile));
     return new Config(conf);

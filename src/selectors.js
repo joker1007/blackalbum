@@ -1,5 +1,8 @@
+/* @flow */
+
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import _ from 'lodash';
+import { OrderedMap } from 'immutable';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
 const filesSelector = state => state.get("files");
@@ -10,7 +13,7 @@ const searchKeywordSelector = state => state.get("searchKeyword");
 const selectedFilesSelector = state => state.get("selectedFiles");
 const sortOrderSelector = state => state.get("sortOrder");
 
-const visibleFiles = (files, searchKeyword) => {
+const visibleFiles = (files: OrderedMap, searchKeyword: string) => {
   if (_.isEmpty(searchKeyword)) {
     return files;
   } else {
@@ -20,32 +23,24 @@ const visibleFiles = (files, searchKeyword) => {
   }
 };
 
-const sortFiles = (files, sortOrder) => {
+const sortFiles = (files: OrderedMap, sortOrder: string) => {
   switch (sortOrder) {
     case FILENAME_ASC:
       return files.sortBy(f => {return f.basename});
-      break;
     case FILENAME_DESC:
       return files.sortBy(f => {return f.basename}).reverse();
-      break;
     case FULLPATH_ASC:
       return files.sortBy(f => {return f.fullpath});
-      break;
     case FULLPATH_DESC:
       return files.sortBy(f => {return f.fullpath}).reverse();
-      break;
     case FILESIZE_ASC:
       return files.sortBy(f => {return f.filesize});
-      break;
     case FILESIZE_DESC:
       return files.sortBy(f => {return f.filesize}).reverse();
-      break;
     case CTIME_ASC:
       return files.sortBy(f => {return f.ctime});
-      break;
     case CTIME_DESC:
       return files.sortBy(f => {return f.ctime}).reverse();
-      break;
   }
 };
 

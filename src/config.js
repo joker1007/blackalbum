@@ -8,39 +8,48 @@ let path = global.require('path');
 let glob = denodeify(_glob);
 
 export default class Config {
-  constructor({ directories = [], extensions = {}, thumbnail = {}, filterWords = [] }) {
-    this.targetDirectories = directories;
-    this.extensions = extensions;
-    let {directory = defaultThumbnailDir, count = 5, size = "240" } = thumbnail;
-    this.thumbnail = thumbnail;
-    this.thumbnail.dir = directory;
-    this.thumbnail.count = count;
-    this.thumbnail.size = size;
-    this.filterWords = filterWords.map(w => { return new RegExp(w); });
+  targetDirectories: Array<string>;
+  extensions: {[key: string]: Object};
+  thumbnail: {dir: string, count: number, size: number};
+  filterWords: Array<string>;
+
+  constructor({ directories, extensions, thumbnail, filterWords }: Object) {
+    this.targetDirectories = directories || [];
+    this.extensions = extensions || {};
+    let {directory, count, size } = thumbnail || {};
+    this.thumbnail = thumbnail || {};
+    this.thumbnail.dir = directory || defaultThumbnailDir;
+    this.thumbnail.count = count || 5;
+    this.thumbnail.size = size || 240;
+    if (Array.isArray(filterWords)) {
+      this.filterWords = filterWords.map(w => { return new RegExp(w); });
+    } else {
+      this.filterWords = [];
+    }
   }
 
-  get targetExtensions() {
+  get targetExtensions(): Array<string> {
     return Object.keys(this.extensions)
   }
 
-  get entryContainerHeight() {
+  get entryContainerHeight(): number {
     return Math.round(this.thumbnail.size / 4 * 3) + 34;
   }
 
-  getAllCommands(extname) {
+  getAllCommands(extname: string): {[key: string]: string} {
     return this.extensions[extname]
   }
 
-  getCommand(extname) {
+  getCommand(extname: string): string {
     let commands = this.getAllCommands(extname);
     return commands[Object.keys(commands)[0]];
   }
 
-  getCommandNames(extname) {
+  getCommandNames(extname: string): Array<string> {
     return Object.keys(this.extensions[extname]);
   }
 
-  async getTargetFiles() {
+  async getTargetFiles(): List<string> {
     const files = new List().asMutable();
     for (let dir of this.targetDirectories) {
       let globbed = await glob(path.join(dir, "**", `*.{${this.targetExtensions.join(",")}}`));

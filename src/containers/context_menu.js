@@ -1,3 +1,5 @@
+/* @flow */
+
 import React, { Component } from 'react';
 
 let remote = global.require('remote');
@@ -13,12 +15,12 @@ export default class ContextMenu extends Component {
     window.removeEventListener('contextmenu', this.contextMenuHandler);
   }
 
-  render() {
+  render(): mixed {
     return null;
   }
 
-  popupMenu(e) {
-    const { selectedFiles } = this.props;
+  popupMenu(e: mixed): void {
+    let { selectedFiles } = this.props;
     const selected = selectedFiles.first();
     if (!selected) {
       return;

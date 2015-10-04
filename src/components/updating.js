@@ -1,9 +1,11 @@
+/* @flow */
+
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 export default class Updating extends Component {
-  render() {
-    const { updating, updatingFiles, updatedFiles } = this.props;
+  render(): any {
+    let { updating, updatingFiles, updatedFiles } = this.props;
     if (updating) {
       return (
         <div>
