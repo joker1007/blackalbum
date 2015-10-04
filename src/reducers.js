@@ -1,6 +1,6 @@
 import { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import { handleActions } from 'redux-actions';
-import { LIST_FILES, UPDATE_DB_REQUEST, UPDATE_FINISH, UPDATE_FINISH_ALL, UPDATE_SEARCH_KEYWORD, SELECT_FILE, REMOVE_FILE, SET_SORT_ORDER, REGENERATE_THUMBNAIL, FILENAME_ASC } from './actions';
+import { LIST_FILES, UPDATE_DB_REQUEST, UPDATE_FINISH, UPDATE_FINISH_ALL, UPDATE_SEARCH_KEYWORD, SELECT_FILE, MULTI_SELECT_FILES, REMOVE_FILE, SET_SORT_ORDER, REGENERATE_THUMBNAIL, FILENAME_ASC } from './actions';
 
 export const reducer = handleActions({
   [LIST_FILES]: (state,  action) => {
@@ -38,6 +38,13 @@ export const reducer = handleActions({
     return state.merge({
       selectedFiles: new ImmutableMap([[file.id, file]]),
       currentCursor: file,
+    });
+  },
+  [MULTI_SELECT_FILES]: (state, action) => {
+    const { files } = action.payload;
+    console.log(files);
+    return state.merge({
+      selectedFiles: new ImmutableMap(files.map(f => [f.id, f])),
     });
   },
   [REMOVE_FILE]: (state, action) => {

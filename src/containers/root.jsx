@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import { HotKeys } from 'react-hotkeys';
 import _ from 'lodash';
-import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder } from '../actions';
+import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder, multiSelectFiles } from '../actions';
 import { allSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
@@ -64,14 +64,22 @@ class Root extends Component {
     );
   }
 
-  searchFormChangeHandler(keyword) {
+  searchFormChangeHandler(keyword: string) {
     let { dispatch } = this.props;
     dispatch(updateSearchKeyword(keyword));
   }
 
-  selectFile(file) {
-    let { dispatch } = this.props;
-    dispatch(selectFile(file));
+  selectFile(e: {shiftKey: boolean}, file: MediaFile) {
+    let { dispatch, selectedFiles } = this.props;
+    if (!selectedFiles.isEmpty() && e.shiftKey) {
+      let { files, currentCursor } = this.props;
+      let begin = files.indexOf(currentCursor);
+      let end = files.indexOf(file);
+      [begin, end] = [begin, end].sort()
+      dispatch(multiSelectFiles(files.slice(begin, end + 1)));
+    } else {
+      dispatch(selectFile(file));
+    }
   }
 
   playSelected(e) {

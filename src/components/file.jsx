@@ -86,10 +86,10 @@ class FileComponent extends Component {
     file.execute();
   }
 
-  selectFile(e: Event): void {
+  selectFile(e: Object): void {
     e.preventDefault();
     let { file, onClickHandler } = this.props;
-    onClickHandler(file);
+    onClickHandler(e, file);
   }
 }
 

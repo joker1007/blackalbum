@@ -21,6 +21,7 @@ export const UPDATE_FINISH_ALL = 'UPDATE_FINISH_ALL';
 export const UPDATE_FINISH = 'UPDATE_FINISH';
 export const UPDATE_SEARCH_KEYWORD = 'UPDATE_SEARCH_KEYWORD';
 export const SELECT_FILE = 'SELECT_FILE';
+export const MULTI_SELECT_FILES = 'MULTI_SELECT_FILES';
 export const SELECT_RANGE_FILES = 'SELECT_RANGE_FILES';
 export const SELECT_MULTI_FILES = 'SELECT_MULTI_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
@@ -66,12 +67,16 @@ export let finishAllUpdate = createAction(UPDATE_FINISH_ALL, () => {
 });
 
 export let selectFile = createAction(SELECT_FILE, (file) => {
-  return { file }
+  return { file };
+});
+
+export let multiSelectFiles = createAction(MULTI_SELECT_FILES, (files) => {
+  return { files };
 });
 
 export let removeFile = createAction(REMOVE_FILE, async (file) => {
-  await global.db.files.delete(file.id)
-  return { file }
+  await global.db.files.delete(file.id);
+  return { file };
 });
 
 export let setSortOrder = createAction(SET_SORT_ORDER, sortOrder => {
