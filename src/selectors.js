@@ -2,16 +2,18 @@
 
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import _ from 'lodash';
-import type { OrderedMap } from 'immutable';
+import type { OrderedMap, List } from 'immutable';
+import type MediaFile from './media_file';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
-const filesSelector = state => state.get("files");
-const updatingSelector = state => state.get("updating");
-const updatingFilesSelector = state => state.get("updatingFiles");
-const updatedFilesSelector = state => state.get("updatedFiles");
-const searchKeywordSelector = state => state.get("searchKeyword");
-const selectedFilesSelector = state => state.get("selectedFiles");
-const sortOrderSelector = state => state.get("sortOrder");
+const filesSelector: (state: Object) => List<MediaFile> = state => state.get("files").toList();
+const updatingSelector: (state: Object) => boolean = state => state.get("updating");
+const updatingFilesSelector: (state: Object) => List<string> = state => state.get("updatingFiles");
+const updatedFilesSelector: (state: Object) => List<string> = state => state.get("updatedFiles");
+const searchKeywordSelector: (state: Object) => string = state => state.get("searchKeyword");
+const selectedFilesSelector: (state: Object) => OrderedMap<MediaFile> = state => state.get("selectedFiles");
+const sortOrderSelector: (state: Object) => string = state => state.get("sortOrder");
+const currentCursorSelector: (state: Object) => ?MediaFile = state => state.get("currentCursor");
 
 const visibleFiles = (files: OrderedMap, searchKeyword: string) => {
   if (_.isEmpty(searchKeyword)) {
@@ -98,7 +100,8 @@ export const allSelector = createSelector(
   sortFilesSelector,
   composedUpdatingSelector,
   selectedFilesSelector,
-  ({files, searchKeyword, sortOrder}, {updating, updatingFiles, updatedFiles}, selectedFiles) => (
+  currentCursorSelector,
+  ({files, searchKeyword, sortOrder}, {updating, updatingFiles, updatedFiles}, selectedFiles, currentCursor) => (
     {
       files,
       searchKeyword,
@@ -107,6 +110,7 @@ export const allSelector = createSelector(
       updatingFiles,
       updatedFiles,
       selectedFiles,
+      currentCursor,
     }
   )
 );

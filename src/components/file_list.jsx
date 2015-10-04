@@ -41,7 +41,7 @@ export default class FileList extends Component {
         timeScrollStateLastsForAfterUserScrolls={50}
         preloadBatchSize={this.state.displayHeight - 80}
         preloadAdditionalHeight={(this.state.displayHeight - 80) * 2}>
-        {this.fileComponents.toArray()}
+        {this.fileComponents}
       </Infinite>
     );
   }
@@ -52,7 +52,13 @@ export default class FileList extends Component {
 }
 
 FileList.propTypes = {
-  files: ImmutablePropTypes.orderedMap.isRequired,
+  files: ImmutablePropTypes.listOf(
+    PropTypes.shape({
+      basename: PropTypes.string.isRequired,
+      fullpath: PropTypes.string.isRequired,
+      filesize: PropTypes.number,
+    })
+  ).isRequired,
   selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };

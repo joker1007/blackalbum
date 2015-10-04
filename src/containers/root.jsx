@@ -11,7 +11,9 @@ import { allSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
 import AppMenu from './menu';
+import KeyHandler from './key_handler';
 import ContextMenu from './context_menu';
+import type MediaFile from '../media_file';
 
 class Root extends Component {
   componentDidMount() {
@@ -31,39 +33,34 @@ class Root extends Component {
       sortOrder
     } = this.props;
 
-    const keymap = {
-      'pressEnter': ['enter', 'return'],
-      'pressShiftEnter': ['shift+enter', 'shift+return'],
-      'pressDel': ['del'],
-    };
-
     const keyHandlers = {
-      'pressEnter': _.debounce(this.playSelected.bind(this), 10),
-      'pressDel': _.debounce(this.removeSelected.bind(this), 10),
-      'pressShiftEnter': _.debounce(this.dispatchContextMenu.bind(this), 10),
+      'playSelected': this.playSelected.bind(this),
+      'removeSelected': this.removeSelected.bind(this),
+      'openContextMenu': this.dispatchContextMenu.bind(this),
+      'moveDownCursor': this.moveDownCursor.bind(this),
+      'moveUpCursor': this.moveUpCursor.bind(this),
     };
 
     return (
-      <HotKeys keyMap={keymap} handlers={keyHandlers}>
-        <div>
-          <Header
-            searchKeyword={searchKeyword}
-            sortOrder={sortOrder}
-            searchFormChangeHandler={this.searchFormChangeHandler.bind(this)}
-            sortSelectChangeHandler={this.changeSortOrder.bind(this)}
-            fileCount={files.size}
-            updating={updating}
-            updatingFiles={updatingFiles}
-            updatedFiles={updatedFiles}
-          />
-          <AppMenu />
-          <ContextMenu {...this.props} />
-          <FileList
-            files={files}
-            selectedFiles={selectedFiles}
-            onClickHandler={this.selectFile.bind(this)} />
-        </div>
-      </HotKeys>
+      <div>
+        <Header
+          searchKeyword={searchKeyword}
+          sortOrder={sortOrder}
+          searchFormChangeHandler={this.searchFormChangeHandler.bind(this)}
+          sortSelectChangeHandler={this.changeSortOrder.bind(this)}
+          fileCount={files.size}
+          updating={updating}
+          updatingFiles={updatingFiles}
+          updatedFiles={updatedFiles}
+        />
+        <KeyHandler keyHandlers={keyHandlers} />
+        <AppMenu />
+        <ContextMenu {...this.props} />
+        <FileList
+          files={files}
+          selectedFiles={selectedFiles}
+          onClickHandler={this.selectFile.bind(this)} />
+      </div>
     );
   }
 
@@ -99,16 +96,50 @@ class Root extends Component {
     let { dispatch } = this.props;
     dispatch(setSortOrder(sortOrder));
   }
+
+  moveDownCursor(e) {
+    e.preventDefault();
+    let { dispatch, files, currentCursor } = this.props;
+    let selectedFileIndex = currentCursor ? files.indexOf(currentCursor) : -1;
+    let nextFile: ?MediaFile = files.get(selectedFileIndex + 1);
+    if (nextFile) {
+      dispatch(selectFile(nextFile));
+      let entriesEl = document.querySelector(".entries");
+      let currentScrollTop = entriesEl.scrollTop;
+      entriesEl.scrollTop = currentScrollTop + global.config.entryContainerHeight;
+    }
+  }
+
+  moveUpCursor() {
+    let { dispatch, files, currentCursor } = this.props;
+    let selectedFileIndex = currentCursor ? files.indexOf(currentCursor) : 1;
+    let nextFile: ?MediaFile = files.get(selectedFileIndex - 1);
+    if (nextFile) {
+      dispatch(selectFile(nextFile));
+      let entriesEl = document.querySelector(".entries");
+      let currentScrollTop = entriesEl.scrollTop;
+      entriesEl.scrollTop = currentScrollTop - global.config.entryContainerHeight;
+    }
+  }
 }
 
 Root.propTypes = {
-  files: ImmutablePropTypes.orderedMap.isRequired,
+  files: ImmutablePropTypes.listOf(PropTypes.shape({
+    basename: PropTypes.string.isRequired,
+    fullpath: PropTypes.string.isRequired,
+    filesize: PropTypes.number,
+  })).isRequired,
   updating: PropTypes.bool.isRequired,
-  updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
-  updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
+  updatingFiles: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
+  updatedFiles: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   searchKeyword: PropTypes.string.isRequired,
   selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   sortOrder: PropTypes.string.isRequired,
+  currentCursor: PropTypes.shape({
+    basename: PropTypes.string.isRequired,
+    fullpath: PropTypes.string.isRequired,
+    filesize: PropTypes.number,
+  }),
 };
 
 export default connect(allSelector)(Root);

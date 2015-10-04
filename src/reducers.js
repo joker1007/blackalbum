@@ -36,7 +36,8 @@ export const reducer = handleActions({
   [SELECT_FILE]: (state, action) => {
     const { file } = action.payload;
     return state.merge({
-      selectedFiles: new OrderedMap([[file.id, file]])
+      selectedFiles: new OrderedMap([[file.id, file]]),
+      currentCursor: file,
     });
   },
   [REMOVE_FILE]: (state, action) => {
@@ -46,6 +47,7 @@ export const reducer = handleActions({
     return state.merge({
       files: files.delete(file.id),
       selectedFiles: selectedFiles.delete(file.id),
+      currentCursor: null,
     });
   },
   [SET_SORT_ORDER]: (state, action) => {
@@ -76,5 +78,6 @@ export const reducer = handleActions({
   updatedFiles: new List(),
   searchKeyword: "",
   selectedFiles: new OrderedMap(),
+  currentCursor: null,
   sortOrder: FILENAME_ASC,
 }));

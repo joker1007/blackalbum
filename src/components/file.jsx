@@ -95,7 +95,8 @@ export default class FileComponent extends Component {
 FileComponent.propTypes = {
   file: PropTypes.shape({
     basename: PropTypes.string.isRequired,
-    fullpath: PropTypes.string.isRequired
+    fullpath: PropTypes.string.isRequired,
+    filesize: PropTypes.number,
   }),
   selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   onClickHandler: PropTypes.func.isRequired,
