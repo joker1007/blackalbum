@@ -13,7 +13,7 @@ export default class FileComponent extends Component {
   shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: OrderedMap}, nextState: Object): boolean {
     let { file, selectedFiles } = nextProps;
     let selected = !!selectedFiles.get(file.id.toString());
-    return (this.file !== file) || (this.selected !== selected);
+    return (!this.file.equals(file)) || (this.selected !== selected);
   }
 
   render(): Component {
