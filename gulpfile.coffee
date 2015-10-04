@@ -63,7 +63,7 @@ packageConfig = {
   dir: "."
   out: "dist"
   arch: "x64"
-  version: "0.33.1"
+  version: "0.33.4"
   prune: true
   ignore: /(gulpfile\.coffee|src|sass|.*\.map)/
   asar: true
