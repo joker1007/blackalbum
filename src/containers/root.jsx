@@ -133,7 +133,7 @@ Root.propTypes = {
   updatingFiles: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   updatedFiles: ImmutablePropTypes.listOf(PropTypes.string).isRequired,
   searchKeyword: PropTypes.string.isRequired,
-  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
+  selectedFiles: ImmutablePropTypes.map.isRequired,
   sortOrder: PropTypes.string.isRequired,
   currentCursor: PropTypes.shape({
     basename: PropTypes.string.isRequired,

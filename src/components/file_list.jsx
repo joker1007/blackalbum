@@ -5,8 +5,13 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import FileComponent from './file';
 import _ from 'lodash';
 import Infinite from 'react-infinite';
+import { OrderedMap, Set as ImmutableSet } from 'immutable';
+import type { List, Map as ImmutableMap } from 'immutable';
+import type MediaFile from '../media_file';
 
 export default class FileList extends Component {
+  files: List<MediaFile>;
+
   constructor(props: Object) {
     super(props);
     this.state = {displayHeight: window.innerHeight};
@@ -21,14 +26,18 @@ export default class FileList extends Component {
     window.removeEventListener("resize", this.updateDisplayHeightBinded);
   }
 
+  shouldComponentUpdate(nextProps: Object, nextState: Object): boolean {
+    return !(this.files === nextProps.files);
+  }
+
   render() {
-    let { files, selectedFiles, onClickHandler } = this.props;
-    this.fileComponents = files.map(f => {
+    let { files, onClickHandler } = this.props;
+    this.files = files;
+    let fileComponents = files.map(f => {
       return (
         <FileComponent
           key={f.id}
           file={f}
-          selectedFiles={selectedFiles}
           onClickHandler={onClickHandler} />
       );
     });
@@ -41,7 +50,7 @@ export default class FileList extends Component {
         timeScrollStateLastsForAfterUserScrolls={50}
         preloadBatchSize={this.state.displayHeight - 80}
         preloadAdditionalHeight={(this.state.displayHeight - 80) * 2}>
-        {this.fileComponents}
+        {fileComponents}
       </Infinite>
     );
   }
@@ -59,6 +68,5 @@ FileList.propTypes = {
       filesize: PropTypes.number,
     })
   ).isRequired,
-  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };

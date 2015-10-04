@@ -1,17 +1,18 @@
 /* @flow */
 
 import React, { Component, PropTypes } from 'react';
+import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
 import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
 import type MediaFile from '../media_file';
-import type { OrderedMap } from 'immutable';
+import type { Map as ImmutableMap } from 'immutable';
 var childProcess = global.require('child_process');
 var path = global.require('path');
 
-export default class FileComponent extends Component {
-  shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: OrderedMap}, nextState: Object): boolean {
+class FileComponent extends Component {
+  shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: ImmutableMap}, nextState: Object): boolean {
     let { file, selectedFiles } = nextProps;
     let selected = !!selectedFiles.get(file.id);
     return (!this.file.equals(file)) || (this.selected !== selected);
@@ -98,6 +99,8 @@ FileComponent.propTypes = {
     fullpath: PropTypes.string.isRequired,
     filesize: PropTypes.number,
   }),
-  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
+  selectedFiles: ImmutablePropTypes.map.isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };
+
+export default connect(state => ({selectedFiles: state.get("selectedFiles")}))(FileComponent);

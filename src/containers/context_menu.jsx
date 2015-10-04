@@ -53,7 +53,7 @@ class ContextMenu extends Component {
 }
 
 ContextMenu.propTypes = {
-  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
+  selectedFiles: ImmutablePropTypes.map.isRequired,
 }
 
 export default connect()(ContextMenu);

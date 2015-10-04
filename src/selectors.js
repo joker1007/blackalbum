@@ -2,7 +2,7 @@
 
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import _ from 'lodash';
-import type { OrderedMap, List } from 'immutable';
+import type { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import type MediaFile from './media_file';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
@@ -11,7 +11,7 @@ const updatingSelector: (state: Object) => boolean = state => state.get("updatin
 const updatingFilesSelector: (state: Object) => List<string> = state => state.get("updatingFiles");
 const updatedFilesSelector: (state: Object) => List<string> = state => state.get("updatedFiles");
 const searchKeywordSelector: (state: Object) => string = state => state.get("searchKeyword");
-const selectedFilesSelector: (state: Object) => OrderedMap<MediaFile> = state => state.get("selectedFiles");
+const selectedFilesSelector: (state: Object) => ImmutableMap<MediaFile> = state => state.get("selectedFiles");
 const sortOrderSelector: (state: Object) => string = state => state.get("sortOrder");
 const currentCursorSelector: (state: Object) => ?MediaFile = state => state.get("currentCursor");
 
