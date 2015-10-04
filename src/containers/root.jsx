@@ -39,6 +39,10 @@ class Root extends Component {
       'openContextMenu': this.dispatchContextMenu.bind(this),
       'moveDownCursor': this.moveDownCursor.bind(this),
       'moveUpCursor': this.moveUpCursor.bind(this),
+      'pageUp': this.pageUp.bind(this),
+      'pageDown': this.pageDown.bind(this),
+      'halfPageUp': this.halfPageUp.bind(this),
+      'halfPageDown': this.halfPageDown.bind(this),
     };
 
     return (
@@ -128,6 +132,30 @@ class Root extends Component {
       let currentScrollTop = entriesEl.scrollTop;
       entriesEl.scrollTop = currentScrollTop - global.config.entryContainerHeight;
     }
+  }
+
+  pageDown() {
+    let entriesEl = document.querySelector(".entries");
+    let currentScrollTop = entriesEl.scrollTop;
+    entriesEl.scrollTop = currentScrollTop + entriesEl.clientHeight;
+  }
+
+  pageUp() {
+    let entriesEl = document.querySelector(".entries");
+    let currentScrollTop = entriesEl.scrollTop;
+    entriesEl.scrollTop = currentScrollTop - entriesEl.clientHeight;
+  }
+
+  halfPageUp() {
+    let entriesEl = document.querySelector(".entries");
+    let currentScrollTop = entriesEl.scrollTop;
+    entriesEl.scrollTop = currentScrollTop + entriesEl.clientHeight / 2;
+  }
+
+  halfPageDown() {
+    let entriesEl = document.querySelector(".entries");
+    let currentScrollTop = entriesEl.scrollTop;
+    entriesEl.scrollTop = currentScrollTop - entriesEl.clientHeight / 2;
   }
 }
 

@@ -7,5 +7,11 @@ const keymaps: {[key: string]: string} = {
   'backspace': 'removeSelected',
   'up': 'moveUpCursor',
   'down': 'moveDownCursor',
+  'pageup': 'pageUp',
+  'pagedown': 'pageDown',
+  'ctrl+b': 'pageUp',
+  'ctrl+f': 'pageDown',
+  'ctrl+d': 'halfPageUp',
+  'ctrl+u': 'halfPageDown',
 };
 export default keymaps;
