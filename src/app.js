@@ -13,17 +13,19 @@ import Root from './containers/root';
 
 let fs = global.require('fs');
 let path = global.require('path');
+let process = global.require('process');
 
 let middlewares = [thunk, promiseMiddleware];
 
 global.production = true;
 // @if NODE_ENV='development'
-import { devTools, persistState } from 'redux-devtools';
-import { DevTools, DebugPanel, LogMonitor } from 'redux-devtools/lib/react';
-global.production = false;
+if (process.env.NODE_ENV === "development") {
+  var { devTools, persistState } = require('redux-devtools');
+  var { DevTools, DebugPanel, LogMonitor } = require('redux-devtools/lib/react');
+  global.production = false;
 
-let logger = createLogger();
-middlewares.push(logger);
+  middlewares.push(createLogger());
+}
 // @endif
 
 

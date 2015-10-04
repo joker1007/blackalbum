@@ -3,6 +3,7 @@
 let path = global.require('path');
 let fs = global.require('fs');
 let fsExtra = global.require('fs-extra');
+let process = global.require('process');
 
 export function getUserHome(): string {
   return process.env.HOME || process.env.USERPROFILE;

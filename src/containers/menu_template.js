@@ -1,4 +1,6 @@
 const remote = global.require('remote');
+const process = global.require('process');
+
 const template = [
   {
     label: 'Edit',
@@ -92,17 +94,7 @@ const template = [
         role: 'close'
       },
     ]
-  },
-  {
-    label: 'Help',
-    role: 'help',
-    submenu: [
-      {
-        label: 'Learn More',
-        click: function() { require('shell').openExternal('http://electron.atom.io') }
-      },
-    ]
-  },
+  }
 ];
 
 if (process.platform == 'darwin') {

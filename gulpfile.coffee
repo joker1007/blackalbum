@@ -8,6 +8,8 @@ process    = require('process')
 _          = require('lodash')
 del        = require('del')
 
+source     = require('vinyl-source-stream')
+
 electron = require('electron-connect').server.create()
 packager = require('electron-packager')
 
@@ -35,6 +37,12 @@ gulp.task 'compile', ->
     .pipe(plugins.notify(title: "Babel", message: "compiled"))
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('build'))
+
+gulp.task 'browserify', ->
+  browserify('src/app.js').bundle()
+    .pipe(source("app.js"))
+    .pipe(plugins.streamify(plugins.uglify()))
+    .pipe(gulp.dest("build"))
 
 gulp.task 'sass', ->
   gulp.src('sass/**/*.{sass,scss}')
@@ -65,16 +73,16 @@ packageConfig = {
   arch: "x64"
   version: "0.33.4"
   prune: true
-  ignore: /(gulpfile\.coffee|src|sass|.*\.map)/
+  ignore: /(node_modules|gulpfile\.coffee|src|sass|.*\.map)/
   asar: true
   overwrite: true
   "app-version": VERSION
 }
-gulp.task 'package:mac', ['build'], (done) ->
+gulp.task 'package:mac', ['browserify', 'html'], (done) ->
   packager(_.extend({}, packageConfig, platform: "darwin"), (err, path) ->
     done()
   )
-gulp.task 'package:linux', ['build'], (done) ->
+gulp.task 'package:linux', ['browserify', 'html'], (done) ->
   packager(_.extend({}, packageConfig, platform: "linux"), (err, path) ->
     done()
   )
