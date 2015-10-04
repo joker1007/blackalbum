@@ -6,6 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
 import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
+import humanize from 'humanize';
 import type MediaFile from '../media_file';
 import type { Map as ImmutableMap } from 'immutable';
 var childProcess = global.require('child_process');
@@ -66,7 +67,7 @@ class FileComponent extends Component {
                 <td className="info--name">Res:</td><td>{file.resolution}</td>
               </tr>
               <tr>
-                <td className="info--name">Size:</td><td>{file.filesize.toLocaleString()} Byte</td>
+                <td className="info--name">Size:</td><td>{humanize.filesize(file.filesize)}</td>
               </tr>
             </table>
           </div>
