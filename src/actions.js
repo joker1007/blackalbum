@@ -25,6 +25,7 @@ export const SELECT_RANGE_FILES = 'SELECT_RANGE_FILES';
 export const SELECT_MULTI_FILES = 'SELECT_MULTI_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
 export const SET_SORT_ORDER = 'SET_SORT_ORDER';
+export const REGENERATE_THUMBNAIL = 'REGENERATE_THUMBNAIL';
 
 /*
  * Sort Order Names
@@ -79,6 +80,16 @@ export let setSortOrder = createAction(SET_SORT_ORDER, sortOrder => {
 
 export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
   return { keyword };
+});
+
+export let regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async selectedFiles => {
+  let promises = [];
+  let { count, size } = global.config.thumbnail;
+  selectedFiles.forEach(f => {
+    promises.push(f.createThumbnail({ count, size }, true));
+  });
+  await Promise.all(promises);
+  return { selectedFiles };
 });
 
 export function updateDb(targetFiles: List<string>): Function {

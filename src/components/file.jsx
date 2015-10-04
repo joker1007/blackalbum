@@ -1,6 +1,7 @@
 /* @flow */
 
 import React, { Component, PropTypes } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
 import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
@@ -12,14 +13,14 @@ var path = global.require('path');
 export default class FileComponent extends Component {
   shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: OrderedMap}, nextState: Object): boolean {
     let { file, selectedFiles } = nextProps;
-    let selected = !!selectedFiles.get(file.id.toString());
+    let selected = !!selectedFiles.get(file.id);
     return (!this.file.equals(file)) || (this.selected !== selected);
   }
 
   render(): Component {
     let { file, selectedFiles } = this.props;
     this.file = file;
-    this.selected = !!selectedFiles.get(file.id.toString());
+    this.selected = !!selectedFiles.get(file.id);
     const entryClassNames = classNames({
       entry: true,
       selected: this.selected,
@@ -31,7 +32,7 @@ export default class FileComponent extends Component {
     const thumbnails = file.thumbnails.map(th => {
       let style = {
         backgroundColor: "black",
-        backgroundImage: `url("${th}")`,
+        backgroundImage: `url("${th}?${file.thumbnailVersion}")`,
         backgroundPosition: "center center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain",
@@ -96,6 +97,6 @@ FileComponent.propTypes = {
     basename: PropTypes.string.isRequired,
     fullpath: PropTypes.string.isRequired
   }),
-  selectedFiles: PropTypes.object.isRequired,
+  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };

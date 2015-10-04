@@ -1,6 +1,6 @@
 import { Map, OrderedMap, List } from 'immutable';
 import { handleActions } from 'redux-actions';
-import { LIST_FILES, UPDATE_DB_REQUEST, UPDATE_FINISH, UPDATE_FINISH_ALL, UPDATE_SEARCH_KEYWORD, SELECT_FILE, REMOVE_FILE, SET_SORT_ORDER, FILENAME_ASC } from './actions';
+import { LIST_FILES, UPDATE_DB_REQUEST, UPDATE_FINISH, UPDATE_FINISH_ALL, UPDATE_SEARCH_KEYWORD, SELECT_FILE, REMOVE_FILE, SET_SORT_ORDER, REGENERATE_THUMBNAIL, FILENAME_ASC } from './actions';
 
 export const reducer = handleActions({
   [LIST_FILES]: (state,  action) => {
@@ -36,9 +36,7 @@ export const reducer = handleActions({
   [SELECT_FILE]: (state, action) => {
     const { file } = action.payload;
     return state.merge({
-      selectedFiles: new OrderedMap({
-        [file.id]: file,
-      })
+      selectedFiles: new OrderedMap([[file.id, file]])
     });
   },
   [REMOVE_FILE]: (state, action) => {
@@ -55,7 +53,22 @@ export const reducer = handleActions({
     return state.merge({
       sortOrder: sortOrder
     });
-  }
+  },
+  [REGENERATE_THUMBNAIL]: (state, action) => {
+    const { selectedFiles } = action.payload;
+    const newSelectedFiles = selectedFiles.map(f => (
+      f.set("thumbnailVersion", f.thumbnailVersion + 1)
+    ));
+    const newFiles = state.get("files").withMutations(_files => {
+      newSelectedFiles.forEach(f => {
+        _files.set(f.id, f);
+      });
+    });
+    return state.merge({
+      files: newFiles,
+      selectedFile: newSelectedFiles,
+    });
+  },
 }, new Map({
   files: new OrderedMap(),
   updating: false,

@@ -58,7 +58,8 @@ export default class MediaFile extends Record({
   vBitRate: null,
   acodec: null,
   aBitRate: null,
-  sampleRate: null
+  sampleRate: null,
+  thumbnailVersion: 0
 }) {
   get basenameWithoutExtension() {
     return path.basename(this.basename, path.extname(this.basename));
@@ -143,7 +144,7 @@ export default class MediaFile extends Record({
     );
   }
 
-  async createThumbnail({ count, size }) {
+  async createThumbnail({ count, size }, force = false) {
     return true;
   }
 
@@ -182,10 +183,10 @@ class MovieFile extends MediaFile {
     return sprintf("%d:%02d:%02d", hour, min, sec);
   }
 
-  async createThumbnail({ count, size }) {
+  async createThumbnail({ count, size }, force = false) {
     try {
       await ensureDir(this.thumbnailDir);
-      if (await this.hasAllThumbnail(count))
+      if (!force && await this.hasAllThumbnail(count))
         return;
 
       console.log(`create thumbnail: ${this.fullpath}`);
@@ -193,7 +194,7 @@ class MovieFile extends MediaFile {
       for (let i = 1; i <= count; ++i) {
         results.push(new Promise((resolve, reject) => {
           fsAccess(this.thumbnailPath(i)).then(hasThumbnail => {
-            if (hasThumbnail) {
+            if (!force && hasThumbnail) {
               return resolve();
             }
             childProcess.execFile(
@@ -309,10 +310,10 @@ class ArchiveFile extends MediaFile {
     }
   }
 
-  async createThumbnail({ count, size }) {
+  async createThumbnail({ count, size }, force = false) {
     try {
       await ensureDir(this.thumbnailDir);
-      if (await this.hasAllThumbnail(count))
+      if (!force && await this.hasAllThumbnail(count))
         return;
 
       console.log(`create thumbnail: ${this.fullpath}`);
@@ -324,7 +325,7 @@ class ArchiveFile extends MediaFile {
       let results = [];
       for (let i = 1; i <= targets.length; ++i) {
         let hasThumbnail = await fsAccess(this.thumbnailPath(i));
-        if (hasThumbnail)
+        if (!force && hasThumbnail)
           continue;
 
         let process = new Promise((resolve, reject) => {

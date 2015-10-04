@@ -1,11 +1,14 @@
 /* @flow */
 
 import React, { Component } from 'react';
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import { connect } from 'react-redux';
+import { regenerateThumbnail } from '../actions';
 
 let remote = global.require('remote');
 let Menu = remote.require('menu');
 
-export default class ContextMenu extends Component {
+class ContextMenu extends Component {
   componentDidMount() {
     this.contextMenuHandler = this.popupMenu.bind(this);
     window.addEventListener('contextmenu', this.contextMenuHandler);
@@ -20,21 +23,37 @@ export default class ContextMenu extends Component {
   }
 
   popupMenu(e: mixed): void {
-    let { selectedFiles } = this.props;
-    const selected = selectedFiles.first();
-    if (!selected) {
+    let { dispatch, selectedFiles } = this.props;
+    const selectedFirst = selectedFiles.first();
+    if (!selectedFirst) {
       return;
     }
-    const template = global.config.getCommandNames(selected.extname).map(n => {
+    const template = global.config.getCommandNames(selectedFirst.extname).map(n => {
       return {
         label: n,
         click(item, focusedWindow) {
-          selected.execute(n);
+          selectedFirst.execute(n);
         },
       }
     });
+
+    template.push(
+      {type: 'separator'},
+      {
+        label: "Re-generate thumbnail",
+        click(item, focusedWindow) {
+          dispatch(regenerateThumbnail(selectedFiles));
+        },
+      }
+    )
 
     const menu = Menu.buildFromTemplate(template);
     menu.popup(remote.getCurrentWindow());
   }
 }
+
+ContextMenu.propTypes = {
+  selectedFiles: ImmutablePropTypes.orderedMap.isRequired,
+}
+
+export default connect()(ContextMenu);
