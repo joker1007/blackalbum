@@ -30,6 +30,8 @@ export const reducer = handleActions({
   [UPDATE_SEARCH_KEYWORD]: (state, action) => {
     const { keyword } = action.payload;
     return state.merge({
+      selectedFiles: new ImmutableMap(),
+      currentCursor: null,
       searchKeyword: keyword,
     });
   },
@@ -60,7 +62,9 @@ export const reducer = handleActions({
   [SET_SORT_ORDER]: (state, action) => {
     const { sortOrder } = action.payload;
     return state.merge({
-      sortOrder: sortOrder
+      selectedFiles: new ImmutableMap(),
+      currentCursor: null,
+      sortOrder: sortOrder,
     });
   },
   [REGENERATE_THUMBNAIL]: (state, action) => {

@@ -107,6 +107,7 @@ class Root extends Component {
   changeSortOrder(sortOrder) {
     let { dispatch } = this.props;
     dispatch(setSortOrder(sortOrder));
+    document.querySelector(".entries").scrollTop = 0;
   }
 
   moveDownCursor(e) {
