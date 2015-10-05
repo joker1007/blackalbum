@@ -16,6 +16,9 @@ On OSX
 brew install ffmpeg ffmpegthumbnailer
 ```
 
+## Download
+download from [Release](https://github.com/joker1007/blackalbum/releases)
+
 ## Usage
 Write config file at `~/.blackalbum/config.json`.
 
