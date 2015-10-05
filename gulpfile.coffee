@@ -41,7 +41,6 @@ gulp.task 'compile', ->
 gulp.task 'browserify', ->
   browserify('src/app.js').bundle()
     .pipe(source("app.js"))
-    .pipe(plugins.streamify(plugins.uglify()))
     .pipe(gulp.dest("build"))
 
 gulp.task 'sass', ->
@@ -73,7 +72,7 @@ packageConfig = {
   arch: "x64"
   version: "0.33.4"
   prune: true
-  ignore: /(^\/node_modules\/(?!fs-extra|glob|fluent-ffmpeg).*|gulpfile\.coffee|src|sass|.*\.map)/
+  ignore: /(^\/node_modules\/(?!fs-extra|glob|fluent-ffmpeg|adm-zip|jimp).*|gulpfile\.coffee|src|sass|.*\.map)/
   asar: true
   overwrite: true
   "app-version": VERSION
