@@ -1,7 +1,6 @@
 import { Record } from 'immutable';
 import _ from 'lodash';
 import ObjectPath from 'object-path';
-import denodeify from 'denodeify';
 import { sprintf } from 'sprintf-js';
 import { parse } from 'shell-quote';
 import { fsAccess, ensureDir} from './helpers/path_helper';
@@ -12,7 +11,16 @@ let ffmpeg = global.require('fluent-ffmpeg');
 let fs = global.require('fs');
 let path = global.require('path');
 let childProcess = global.require('child_process');
-let stat = denodeify(fs.stat);
+let stat = path => {
+  return new Promise((resolve, reject) => {
+    fs.stat(path, (err, result) => {
+      if (err)
+        return reject(err);
+
+      resolve(result);
+    });
+  });
+};
 
 const MOVIE_EXTENSIONS = [
   "3g2",

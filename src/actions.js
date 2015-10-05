@@ -3,7 +3,6 @@
 import { OrderedMap, List } from 'immutable';
 import { createAction } from 'redux-actions';
 import _ from 'lodash';
-import denodeify from 'denodeify';
 import MediaFile from './media_file.js';
 import PromisePool from 'es6-promise-pool';
 
@@ -94,13 +93,22 @@ export let regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async select
 
 export function updateDb(targetFiles: List<string>): Function {
   return async dispatch => {
-    const promiseProducer = function * () {
-      for (let f of targetFiles) {
-        yield addFile(f);
-        dispatch(finishUpdate(f))
+    let count = 0;
+    let size = targetFiles.size;
+    const promiseProducer = function () {
+      if (count < size) {
+        let f = targetFiles.get(count);
+        let promise = addFile(f).then(() => {
+          dispatch(finishUpdate(f));
+        });
+        count++;
+        return promise;
+      } else {
+        return null
       }
-    }
-    const pool = new PromisePool(promiseProducer, 4)
+    };
+
+    const pool = new PromisePool(promiseProducer, 1)
     try {
       await pool.start();
     } catch (err) {

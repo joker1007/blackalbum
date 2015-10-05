@@ -1,11 +1,19 @@
 import { defaultThumbnailDir } from './helpers/path_helper';
 import _ from 'lodash';
 import { List } from 'immutable';
-import denodeify from 'denodeify';
 
 let path = global.require('path');
 let _glob = global.require('glob');
-let glob = denodeify(_glob);
+let glob = path => {
+  return new Promise((resolve, reject) => {
+    _glob(path, (err, result) => {
+      if (err)
+        return reject(err);
+
+      resolve(result);
+    });
+  });
+};
 
 export default class Config {
   targetDirectories: Array<string>;

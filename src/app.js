@@ -19,7 +19,7 @@ let middlewares = [thunk, promiseMiddleware];
 
 global.production = true;
 // @if NODE_ENV='development'
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV != "production") {
   var { devTools, persistState } = require('redux-devtools');
   var { DevTools, DebugPanel, LogMonitor } = require('redux-devtools/lib/react');
   global.production = false;

@@ -41,7 +41,6 @@
   "dependencies": {
     "adm-zip": "^0.4.7",
     "classnames": "^2.1.5",
-    "denodeify": "^1.2.1",
     "dexie": "^1.2.0",
     "es6-promise-pool": "^2.4.1",
     "fluent-ffmpeg": "^2.0.1",

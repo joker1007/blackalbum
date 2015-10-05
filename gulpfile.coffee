@@ -41,6 +41,7 @@ gulp.task 'compile', ->
 gulp.task 'browserify', ->
   browserify('src/app.js').bundle()
     .pipe(source("app.js"))
+    .pipe(plugins.streamify(plugins.uglify()))
     .pipe(gulp.dest("build"))
 
 gulp.task 'sass', ->
