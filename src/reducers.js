@@ -44,7 +44,6 @@ export const reducer = handleActions({
   },
   [MULTI_SELECT_FILES]: (state, action) => {
     const { files } = action.payload;
-    console.log(files);
     return state.merge({
       selectedFiles: new ImmutableMap(files.map(f => [f.id, f])),
     });

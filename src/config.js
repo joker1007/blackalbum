@@ -1,10 +1,10 @@
 import { defaultThumbnailDir } from './helpers/path_helper';
 import _ from 'lodash';
 import { List } from 'immutable';
-import _glob from 'glob';
 import denodeify from 'denodeify';
 
 let path = global.require('path');
+let _glob = global.require('glob');
 let glob = denodeify(_glob);
 
 export default class Config {

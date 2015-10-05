@@ -4,13 +4,8 @@ import { OrderedMap, List } from 'immutable';
 import { createAction } from 'redux-actions';
 import _ from 'lodash';
 import denodeify from 'denodeify';
-import _glob from 'glob';
 import MediaFile from './media_file.js';
 import PromisePool from 'es6-promise-pool';
-
-let fs = global.require('fs');
-let path = global.require('path');
-let glob = denodeify(_glob);
 
 /*
  * Action Names

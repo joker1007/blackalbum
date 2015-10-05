@@ -1,7 +1,6 @@
 import { Record } from 'immutable';
 import _ from 'lodash';
 import ObjectPath from 'object-path';
-import ffmpeg from 'fluent-ffmpeg';
 import denodeify from 'denodeify';
 import Zip from 'adm-zip';
 import Jimp from 'jimp';
@@ -9,6 +8,7 @@ import { sprintf } from 'sprintf-js';
 import { parse } from 'shell-quote';
 import { fsAccess, ensureDir} from './helpers/path_helper';
 
+let ffmpeg = global.require('fluent-ffmpeg');
 let fs = global.require('fs');
 let path = global.require('path');
 let childProcess = global.require('child_process');

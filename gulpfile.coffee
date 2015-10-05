@@ -73,7 +73,7 @@ packageConfig = {
   arch: "x64"
   version: "0.33.4"
   prune: true
-  ignore: /(node_modules|gulpfile\.coffee|src|sass|.*\.map)/
+  ignore: /(^\/node_modules\/(?!fs-extra|glob|fluent-ffmpeg).*|gulpfile\.coffee|src|sass|.*\.map)/
   asar: true
   overwrite: true
   "app-version": VERSION
