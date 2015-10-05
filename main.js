@@ -1,5 +1,11 @@
 var app = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
+var process = require('process');
+
+// avoid https://github.com/atom/electron/issues/550
+if (process.platform == "darwin") {
+  process.env['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+}
 
 // Report crashes to our server.
 require('crash-reporter').start();
