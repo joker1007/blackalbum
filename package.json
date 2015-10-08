@@ -2,7 +2,7 @@
   "name": "blackalbum",
   "version": "0.1.0",
   "description": "Electron media browser",
-  "main": "main.js",
+  "main": "build/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,6 +19,7 @@
     "electron-packager": "^5.1.0",
     "electron-prebuilt": "^0.33.4",
     "envify": "^3.4.0",
+    "event-stream": "^3.3.1",
     "gulp": "^3.9.0",
     "gulp-babel": "^5.2.1",
     "gulp-concat": "^2.6.0",

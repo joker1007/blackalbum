@@ -1,6 +1,6 @@
-var app = require('app');  // Module to control application life.
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
-var process = require('process');
+let app = require('app');  // Module to control application life.
+let BrowserWindow = require('browser-window');  // Module to create native browser window.
+let process = require('process');
 
 // avoid https://github.com/atom/electron/issues/550
 if (process.platform == "darwin") {
@@ -12,7 +12,7 @@ require('crash-reporter').start();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
+global.mainWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -27,16 +27,16 @@ app.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1024, height: 600});
+  global.mainWindow = new BrowserWindow({width: 1024, height: 600});
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/build/index.html');
+  global.mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
+  global.mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null;
+    global.mainWindow = null;
   });
 });

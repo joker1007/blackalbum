@@ -8,6 +8,7 @@ process    = require('process')
 _          = require('lodash')
 del        = require('del')
 
+es         = require('event-stream')
 source     = require('vinyl-source-stream')
 
 electron = require('electron-connect').server.create()
@@ -19,13 +20,13 @@ VERSION = "0.0.1"
 isProduction = ->
   env == "production"
 
-gulp.task 'build', ['html', 'sass', 'compile'], ->
+gulp.task 'build', ['html', 'sass', 'compile_main', 'compile_renderer'], ->
 
 gulp.task 'clean', (cb) ->
   del(['dist/**/*', 'build/**/*'], cb)
 
-gulp.task 'compile', ->
-  gulp.src('src/**/*.{js,jsx}')
+gulp.task 'compile_main', ->
+  gulp.src('src/main.js')
     .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.babel({optional: ["runtime"]}))
@@ -38,7 +39,22 @@ gulp.task 'compile', ->
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('build'))
 
-gulp.task 'browserify', ->
+gulp.task 'compile_renderer', ->
+  gulp.src('src/**/*.{js,jsx}')
+    .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
+    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.babel({optional: ["runtime"]}))
+    .on('error', plugins.util.log)
+    .on('error', plugins.notify.onError((err) -> {title: "Babel Compile (Error)", message: "Error: #{err}"}))
+    .on('error', -> this.emit('end'))
+    .pipe(plugins.if(isProduction, plugins.uglify()))
+    .pipe(plugins.sourcemaps.write('.'))
+    .pipe(gulp.dest('build'))
+    .pipe(plugins.concat("dummy.js"))
+    .pipe(plugins.duration("compiled"))
+    .pipe(plugins.notify(title: "Babel", message: "compiled"))
+
+gulp.task 'browserify', ['compile_main'], ->
   browserify('src/app.js').bundle()
     .pipe(source("app.js"))
     .pipe(plugins.streamify(plugins.uglify()))
@@ -90,10 +106,10 @@ gulp.task 'package', ['package:mac', 'package:linux']
 
 gulp.task 'watch', ['build'], ->
   electron.start()
-  gulp.watch('src/**/*.{js,jsx}', ['compile'])
+  gulp.watch('src/main.js', ['compile_main', electron.restart])
+  gulp.watch(['src/**/*.{js,jsx}', '!src/main.js'], ['compile_renderer'])
   gulp.watch('src/**/*.html', ['html'])
   gulp.watch('sass/**/*.{sass,scss}', ['sass'])
-  gulp.watch('main.js', electron.restart)
   gulp.watch(['index.html', 'build/**/*.{html,js,css}', 'stylesheets/**/*.css'], electron.reload)
 
 gulp.task 'default', ['build']
