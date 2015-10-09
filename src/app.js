@@ -9,6 +9,7 @@ import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
 import { reducer } from './reducers';
 import { initAppDir, loadConfig } from './helpers/init_helper';
+import { initDB } from './db';
 import Root from './containers/root';
 
 let fs = global.require('fs');
@@ -29,14 +30,7 @@ if (process.env.NODE_ENV != "production") {
 // @endif
 
 
-var db = new Dexie("blackalbum");
-db.version(1).stores({
-  files: "++id,basename,&fullpath,filesize,ctime,width,height,duration,vcodec,vBitRate,acodec,aBitRate,sampleRate"
-});
-
-db.open();
-
-global.db = db;
+global.db = initDB();
 
 initAppDir();
 global.config = loadConfig();
