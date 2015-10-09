@@ -6,14 +6,14 @@ import type { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import type MediaFile from './media_file';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
-const filesSelector: (state: Object) => List<MediaFile> = state => state.get("files").toList();
-const updatingSelector: (state: Object) => boolean = state => state.get("updating");
-const updatingFilesSelector: (state: Object) => List<string> = state => state.get("updatingFiles");
-const updatedFilesSelector: (state: Object) => List<string> = state => state.get("updatedFiles");
-const searchKeywordSelector: (state: Object) => string = state => state.get("searchKeyword");
-const selectedFilesSelector: (state: Object) => ImmutableMap<MediaFile> = state => state.get("selectedFiles");
-const sortOrderSelector: (state: Object) => string = state => state.get("sortOrder");
-const currentCursorSelector: (state: Object) => ?MediaFile = state => state.get("currentCursor");
+export const filesSelector: (state: Object)         => List<MediaFile>         = state => state.present.get("files").toList();
+export const updatingSelector: (state: Object)      => boolean                 = state => state.present.get("updating");
+export const updatingFilesSelector: (state: Object) => List<string>            = state => state.present.get("updatingFiles");
+export const updatedFilesSelector: (state: Object)  => List<string>            = state => state.present.get("updatedFiles");
+export const searchKeywordSelector: (state: Object) => string                  = state => state.present.get("searchKeyword");
+export const selectedFilesSelector: (state: Object) => ImmutableMap<MediaFile> = state => state.present.get("selectedFiles");
+export const sortOrderSelector: (state: Object)     => string                  = state => state.present.get("sortOrder");
+export const currentCursorSelector: (state: Object) => ?MediaFile              = state => state.present.get("currentCursor");
 
 const visibleFiles = (files: OrderedMap, searchKeyword: string) => {
   if (_.isEmpty(searchKeyword)) {

@@ -7,6 +7,8 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import thunk from 'redux-thunk';
 import createLogger from 'redux-logger';
+import undoable from 'redux-undo';
+import { UPDATE_SEARCH_KEYWORD } from './actions';
 import { reducer } from './reducers';
 import { initAppDir, loadConfig } from './helpers/init_helper';
 import { initDB } from './db';
@@ -44,7 +46,12 @@ if (!global.production) {
 } else {
   var createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
 }
-let store = createStoreWithMiddleware(reducer);
+let store = createStoreWithMiddleware(undoable(reducer, {
+  limit: 10,
+  filter: (action, currentState, previousState) => {
+    return action.type === UPDATE_SEARCH_KEYWORD;
+  }
+}));
 
 document.addEventListener('DOMContentLoaded', () => {
   let rootEl = document.getElementById('main');

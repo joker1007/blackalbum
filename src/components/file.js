@@ -4,11 +4,11 @@ import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
-import LazyLoad from 'react-lazy-load';
 import classNames from 'classnames';
 import humanize from 'humanize';
 import type MediaFile from '../media_file';
 import type { Map as ImmutableMap } from 'immutable';
+import { selectedFilesSelector } from '../selectors';
 var childProcess = global.require('child_process');
 var path = global.require('path');
 
@@ -104,4 +104,4 @@ FileComponent.propTypes = {
   onClickHandler: PropTypes.func.isRequired,
 };
 
-export default connect(state => ({selectedFiles: state.get("selectedFiles")}))(FileComponent);
+export default connect(state => ({selectedFiles: selectedFilesSelector(state)}))(FileComponent);

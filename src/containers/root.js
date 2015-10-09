@@ -4,7 +4,6 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
-import { HotKeys } from 'react-hotkeys';
 import _ from 'lodash';
 import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder, multiSelectFiles } from '../actions';
 import { allSelector } from '../selectors';
