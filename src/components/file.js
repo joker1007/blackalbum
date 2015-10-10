@@ -16,7 +16,8 @@ class FileComponent extends Component {
   shouldComponentUpdate(nextProps: {file: MediaFile, selectedFiles: ImmutableMap}, nextState: Object): boolean {
     let { file, selectedFiles } = nextProps;
     let selected = !!selectedFiles.get(file.id);
-    return (!this.file.equals(file)) || (this.selected !== selected);
+    return (!this.file.equals(file)) ||
+      (this.selected !== selected);
   }
 
   render(): Component {
@@ -27,6 +28,7 @@ class FileComponent extends Component {
       entry: true,
       selected: this.selected,
       unselectable: true,
+      favorited: this.file.favorited,
     });
     const entryStyle = {
       height: (Math.round(global.config.thumbnail.size / 4 * 3) + 20).toString() + "px",

@@ -67,7 +67,8 @@ export default class MediaFile extends Record({
   acodec: null,
   aBitRate: null,
   sampleRate: null,
-  thumbnailVersion: 0
+  thumbnailVersion: 0,
+  favorited: false
 }) {
   get basenameWithoutExtension() {
     return path.basename(this.basename, path.extname(this.basename));
@@ -169,6 +170,15 @@ export default class MediaFile extends Record({
       filesize: this.filesize,
       ctime: this.ctime,
     };
+  }
+
+  async toggleFavorite() {
+    try {
+      await global.db.files.where("id").equals(this.id).modify({favorited: !this.favorited});
+      return this.set("favorited", !this.favorited);
+    } catch (err) {
+      return this;
+    }
   }
 }
 

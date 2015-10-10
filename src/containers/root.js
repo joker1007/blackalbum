@@ -5,7 +5,15 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
-import { listFiles, updateSearchKeyword, selectFile, removeFile, setSortOrder, multiSelectFiles } from '../actions';
+import {
+  listFiles,
+  updateSearchKeyword,
+  selectFile,
+  removeFile,
+  setSortOrder,
+  multiSelectFiles,
+  favorite
+} from '../actions';
 import { allSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
@@ -42,6 +50,7 @@ class Root extends Component {
       'pageDown': this.pageDown.bind(this),
       'halfPageUp': this.halfPageUp.bind(this),
       'halfPageDown': this.halfPageDown.bind(this),
+      'toggleFavorite': this.toggleFavorite.bind(this),
     };
 
     return (
@@ -156,6 +165,11 @@ class Root extends Component {
     let entriesEl = document.querySelector(".entries");
     let currentScrollTop = entriesEl.scrollTop;
     entriesEl.scrollTop = currentScrollTop - entriesEl.clientHeight / 2;
+  }
+
+  toggleFavorite() {
+    let { dispatch, selectedFiles } = this.props;
+    dispatch(favorite(selectedFiles));
   }
 }
 

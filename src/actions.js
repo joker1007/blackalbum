@@ -1,6 +1,6 @@
 /* @flow */
 
-import { OrderedMap, List } from 'immutable';
+import { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import { createAction } from 'redux-actions';
 import _ from 'lodash';
 import MediaFile from './media_file.js';
@@ -21,6 +21,7 @@ export const SELECT_MULTI_FILES = 'SELECT_MULTI_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
 export const SET_SORT_ORDER = 'SET_SORT_ORDER';
 export const REGENERATE_THUMBNAIL = 'REGENERATE_THUMBNAIL';
+export const FAVORITE = 'FAVORITE';
 
 /*
  * Sort Order Names
@@ -88,8 +89,21 @@ export let regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async select
     promises.push(f.createThumbnail({ count, size }, true));
   });
   await Promise.all(promises);
-  return { selectedFiles };
+  return { selectedFiles: selectedFiles.map(f => (
+    f.set("thumbnailVersion", f.thumbnailVersion + 1)
+  )) };
 });
+
+export let favorite = createAction(FAVORITE, async selectedFiles => {
+  const data = [];
+  for (let f of selectedFiles.toArray()) {
+    let result = await f.toggleFavorite();
+    data.push([f.id, result]);
+  }
+  const newFiles = new ImmutableMap(data);
+
+  return { selectedFiles: newFiles };
+})
 
 export function updateDb(targetFiles: List<string>): Function {
   return async dispatch => {

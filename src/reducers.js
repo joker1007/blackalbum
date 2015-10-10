@@ -1,6 +1,19 @@
 import { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import { handleActions } from 'redux-actions';
-import { LIST_FILES, UPDATE_DB_REQUEST, UPDATE_FINISH, UPDATE_FINISH_ALL, UPDATE_SEARCH_KEYWORD, SELECT_FILE, MULTI_SELECT_FILES, REMOVE_FILE, SET_SORT_ORDER, REGENERATE_THUMBNAIL, FILENAME_ASC } from './actions';
+import {
+  LIST_FILES,
+  UPDATE_DB_REQUEST,
+  UPDATE_FINISH,
+  UPDATE_FINISH_ALL,
+  UPDATE_SEARCH_KEYWORD,
+  SELECT_FILE,
+  MULTI_SELECT_FILES,
+  REMOVE_FILE,
+  SET_SORT_ORDER,
+  REGENERATE_THUMBNAIL,
+  FAVORITE,
+  FILENAME_ASC
+} from './actions';
 
 export const reducer = handleActions({
   [LIST_FILES]: (state,  action) => {
@@ -68,17 +81,27 @@ export const reducer = handleActions({
   },
   [REGENERATE_THUMBNAIL]: (state, action) => {
     const { selectedFiles } = action.payload;
-    const newSelectedFiles = selectedFiles.map(f => (
-      f.set("thumbnailVersion", f.thumbnailVersion + 1)
-    ));
     const newFiles = state.get("files").withMutations(_files => {
-      newSelectedFiles.forEach(f => {
+      selectedFiles.forEach(f => {
         _files.set(f.id, f);
       });
     });
     return state.merge({
       files: newFiles,
-      selectedFiles: newSelectedFiles,
+      selectedFiles: selectedFiles,
+    });
+  },
+  [FAVORITE]: (state, action) => {
+    const { selectedFiles } = action.payload;
+    console.log(selectedFiles.toJS());
+    const newFiles = state.get("files").withMutations(_files => {
+      selectedFiles.forEach(f => {
+        _files.set(f.id, f);
+      });
+    });
+    return state.merge({
+      files: newFiles,
+      selectedFiles: selectedFiles,
     });
   },
 }, new ImmutableMap({
