@@ -4,6 +4,7 @@ import { createSelectorCreator, defaultMemoize } from 'reselect';
 import _ from 'lodash';
 import type { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import type MediaFile from './media_file';
+import FileSeacher from './file_seacher';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
 
 export const filesSelector: (state: Object)         => List<MediaFile>         = state => state.present.get("files").toList();
@@ -16,13 +17,8 @@ export const sortOrderSelector: (state: Object)     => string                  =
 export const currentCursorSelector: (state: Object) => ?MediaFile              = state => state.present.get("currentCursor");
 
 const visibleFiles = (files: OrderedMap, searchKeyword: string) => {
-  if (_.isEmpty(searchKeyword)) {
-    return files;
-  } else {
-    return files.filter(f => {
-      return f.basename.includes(searchKeyword);
-    });
-  }
+  const searcher = new FileSeacher(files);
+  return searcher.search(searchKeyword);
 };
 
 const sortFiles = (files: OrderedMap, sortOrder: string) => {
