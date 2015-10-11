@@ -6,6 +6,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
 import classNames from 'classnames';
 import humanize from 'humanize';
+import { Card, FontIcon } from 'material-ui';
 import type MediaFile from '../media_file';
 import type { Map as ImmutableMap } from 'immutable';
 import { selectedFilesSelector } from '../selectors';
@@ -28,10 +29,10 @@ class FileComponent extends Component {
       entry: true,
       selected: this.selected,
       unselectable: true,
-      favorited: this.file.favorited,
+      favorited: file.favorited,
     });
     const entryStyle = {
-      height: (Math.round(global.config.thumbnail.size / 4 * 3) + 20).toString() + "px",
+      height: (Math.round(global.config.thumbnail.size / 4 * 3) + 30).toString() + "px",
     };
     const thumbnails = file.thumbnails.map(th => {
       let style = {
@@ -46,8 +47,13 @@ class FileComponent extends Component {
         </a>
       );
     });
+
+    const favorited = file.favorited ?
+      <FontIcon className="material-icons">favorite</FontIcon> :
+      <FontIcon className="material-icons">favorite_border</FontIcon>
+
     return (
-      <div key={file.id} className={entryClassNames} style={entryStyle} onClick={this.selectFile.bind(this)}>
+      <Card key={file.id} className={entryClassNames} style={entryStyle} onClick={this.selectFile.bind(this)}>
         <div className="entry--thumbnails_and_info">
           <div className="thumbnails">
             <div style={{height: Math.round(global.config.thumbnail.size / 4 * 3).toString()}}>
@@ -57,19 +63,28 @@ class FileComponent extends Component {
           <div className="info selectable">
             <table>
               <tr>
-                <td className="info--name">Duration:</td><td>{file.durationStr}</td>
+                <td className="info--name">Duration:</td>
+                <td>{file.durationStr}</td>
               </tr>
               <tr>
-                <td className="info--name">VCodec:</td><td>{file.vcodec}</td>
+                <td className="info--name">VCodec:</td>
+                <td>{file.vcodec}</td>
               </tr>
               <tr>
-                <td className="info--name">ACodec:</td><td>{file.acodec}</td>
+                <td className="info--name">ACodec:</td>
+                <td>{file.acodec}</td>
               </tr>
               <tr>
-                <td className="info--name">Res:</td><td>{file.resolution}</td>
+                <td className="info--name">Res:</td>
+                <td>{file.resolution}</td>
               </tr>
               <tr>
-                <td className="info--name">Size:</td><td>{humanize.filesize(file.filesize)}</td>
+                <td className="info--name">Size:</td>
+                <td>{humanize.filesize(file.filesize)}</td>
+              </tr>
+              <tr>
+                <td className="info--name">Favorited:</td>
+                <td>{favorited}</td>
               </tr>
             </table>
           </div>
@@ -78,7 +93,7 @@ class FileComponent extends Component {
         <div className="entry--filename">
           <a className="selectable" href="" onClick={this.execute.bind(this)}>{file.basename}</a>
         </div>
-      </div>
+      </Card>
     );
   }
 

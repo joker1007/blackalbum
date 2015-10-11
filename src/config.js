@@ -41,7 +41,7 @@ export default class Config {
   }
 
   get entryContainerHeight(): number {
-    return Math.round(this.thumbnail.size / 4 * 3) + 34;
+    return Math.round(this.thumbnail.size / 4 * 3) + 32;
   }
 
   getAllCommands(extname: string): {[key: string]: string} {

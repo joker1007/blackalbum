@@ -13,6 +13,9 @@ import { reducer } from './reducers';
 import { initAppDir, loadConfig } from './helpers/init_helper';
 import { initDB } from './db';
 import Root from './containers/root';
+import injectTapEventPlugin from "react-tap-event-plugin";
+
+injectTapEventPlugin();
 
 let fs = global.require('fs');
 let path = global.require('path');

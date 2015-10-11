@@ -2,6 +2,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
+import ThemeManager from 'material-ui/lib/styles/theme-manager';
+import Colors from 'material-ui/lib/styles/colors';
+import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
+import DarkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme';
+import { ThemeWrapper } from 'material-ui';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
@@ -22,10 +27,31 @@ import KeyHandler from './key_handler';
 import ContextMenu from './context_menu';
 import type MediaFile from '../media_file';
 
+const darkTheme = ThemeManager.getMuiTheme(DarkTheme);
+const customTheme = ThemeManager.modifyRawThemePalette(darkTheme, {
+  primary1Color: Colors.cyan700,
+  primary2Color: Colors.cyan700,
+  primary3Color: Colors.grey600,
+  accent1Color: Colors.pinkA200,
+  accent2Color: Colors.pinkA400,
+  accent3Color: Colors.pinkA100,
+  textColor: Colors.fullWhite,
+  alternateTextColor: '#303030',
+  canvasColor: '#303030',
+  borderColor: ColorManipulator.fade(Colors.fullWhite, 0.3),
+  disabledColor: ColorManipulator.fade(Colors.fullWhite, 0.3)
+});
+
 class Root extends Component {
   componentDidMount() {
     let { dispatch } = this.props;
     dispatch(listFiles());
+  }
+
+  getChildContext() {
+    return {
+      muiTheme: customTheme,
+    };
   }
 
   render() {
@@ -112,9 +138,9 @@ class Root extends Component {
     window.dispatchEvent(new Event('contextmenu'));
   }
 
-  changeSortOrder(sortOrder) {
+  changeSortOrder(ev) {
     let { dispatch } = this.props;
-    dispatch(setSortOrder(sortOrder));
+    dispatch(setSortOrder(ev.target.value));
     document.querySelector(".entries").scrollTop = 0;
   }
 
@@ -191,5 +217,10 @@ Root.propTypes = {
     filesize: PropTypes.number,
   }),
 };
+
+Root.childContextTypes = {
+  muiTheme: React.PropTypes.object,
+};
+
 
 export default connect(allSelector)(Root);

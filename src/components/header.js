@@ -2,11 +2,16 @@
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import Select from 'react-select';
-import DebounceInput from 'react-debounce-input';
+import _ from 'lodash';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
+import { TextField, SelectField } from 'material-ui';
 
 export default class Header extends Component {
+  constructor(props: Object) {
+    super(props)
+    this.changeSearchHandler = _.debounce(this.changeSearchHandler.bind(this), 400);
+  }
+
   render(): Component {
     let {
       searchKeyword,
@@ -37,21 +42,18 @@ export default class Header extends Component {
     return (
       <header>
         <h3>BlackAlbum</h3>
-        <DebounceInput
-          className="search"
-          type="text"
-          value={searchKeyword}
-          onChange={this.changeSearchHandler.bind(this)}
-          minLength={2}
-          debounceTimeout={200}
-        />
-        <div className="sort">
-          <Select
-            name="sort-order"
-            value={sortOrder}
-            options={options}
-            onChange={sortSelectChangeHandler} />
-        </div>
+        <TextField
+          ref="search"
+          defaultValue={searchKeyword}
+          hintText="basename:foo fullpath:dir1"
+          onChange={this.changeSearchHandler}
+          className="search" />
+        <SelectField
+          value={sortOrder}
+          valueMember="value"
+          displayMember="label"
+          menuItems={options}
+          onChange={sortSelectChangeHandler} />
         <div className="file-count">
           {fileCount} files
         </div>
@@ -60,9 +62,9 @@ export default class Header extends Component {
     );
   }
 
-  changeSearchHandler(value: string) {
+  changeSearchHandler(ev: Event) {
     let { searchFormChangeHandler } = this.props;
-    searchFormChangeHandler(value);
+    searchFormChangeHandler(this.refs.search.getValue());
   }
 }
 
