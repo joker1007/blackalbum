@@ -4,7 +4,7 @@ const keymaps: {[key: string]: string} = {
   'enter': 'playSelected',
   'shift+enter': 'openContextMenu',
   'del': 'removeSelected',
-  'backspace': 'removeSelected',
+  'backspace': 'historyBack',
   'up': 'moveUpCursor',
   'k': 'moveUpCursor',
   'down': 'moveDownCursor',

@@ -4,24 +4,24 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
-import { TextField, SelectField } from 'material-ui';
+import { TextField, SelectField, FontIcon, IconButton } from 'material-ui';
+import SearchTextField from './search_text_field';
 
 export default class Header extends Component {
-  constructor(props: Object) {
-    super(props)
-    this.changeSearchHandler = _.debounce(this.changeSearchHandler.bind(this), 400);
-  }
-
   render(): Component {
     let {
       searchKeyword,
+      searchFormChangeHandler,
       sortOrder,
       sortSelectChangeHandler,
       fileCount,
       updating,
       updatingFiles,
-      updatedFiles
+      updatedFiles,
+      historyBack,
+      historyForward,
     } = this.props;
+
     const options = [
       {value: FILENAME_ASC, label: 'ファイル名 (昇順)'},
       {value: FILENAME_DESC, label: 'ファイル名 (降順)'},
@@ -33,22 +33,36 @@ export default class Header extends Component {
       {value: CTIME_DESC, label: '作成時 (降順)'},
     ];
 
-    let updatingArea = updating ?
+    const updatingArea = updating ?
       <div className="updating">
         updating {updatedFiles.size} of {updatingFiles.size} files.
       </div> :
       null
 
+    const selectFieldStyle = {
+      flex: "0 0 200px",
+      marginRight: "4px",
+      display: "block",
+    }
+
     return (
       <header>
-        <h3>BlackAlbum</h3>
-        <TextField
-          ref="search"
-          defaultValue={searchKeyword}
-          hintText="basename:foo fullpath:dir1"
-          onChange={this.changeSearchHandler}
-          className="search" />
+        <IconButton
+          iconClassName="material-icons"
+          tooltipPosition="bottom-center"
+          tooltip="Undo"
+          onClick={historyBack}>undo</IconButton>
+        <IconButton
+          iconClassName="material-icons"
+          tooltipPosition="bottom-center"
+          tooltip="Redo"
+          onClick={historyForward}>redo</IconButton>
+        <FontIcon className="material-icons">search</FontIcon>
+        <SearchTextField
+          searchKeyword={searchKeyword}
+          searchFormChangeHandler={searchFormChangeHandler} />
         <SelectField
+          style={selectFieldStyle}
           value={sortOrder}
           valueMember="value"
           displayMember="label"
@@ -62,9 +76,8 @@ export default class Header extends Component {
     );
   }
 
-  changeSearchHandler(ev: Event) {
-    let { searchFormChangeHandler } = this.props;
-    searchFormChangeHandler(this.refs.search.getValue());
+  changeSearchHandler(ev: Object) {
+    this.setState({searchKeyword: ev.target.value});
   }
 }
 
@@ -76,4 +89,6 @@ Header.propTypes = {
   updating: PropTypes.bool.isRequired,
   updatingFiles: ImmutablePropTypes.listOf(PropTypes.string),
   updatedFiles: ImmutablePropTypes.listOf(PropTypes.string),
+  historyBack: PropTypes.func.isRequired,
+  historyForward: PropTypes.func.isRequired,
 };

@@ -19,6 +19,7 @@ import {
   multiSelectFiles,
   favorite
 } from '../actions';
+import { ActionCreators } from 'redux-undo';
 import { allSelector } from '../selectors';
 import Header from '../components/header';
 import FileList from '../components/file_list';
@@ -77,6 +78,8 @@ class Root extends Component {
       'halfPageUp': this.halfPageUp.bind(this),
       'halfPageDown': this.halfPageDown.bind(this),
       'toggleFavorite': this.toggleFavorite.bind(this),
+      'historyBack': this.historyBack.bind(this),
+      'historyForward': this.historyForward.bind(this),
     };
 
     return (
@@ -90,6 +93,8 @@ class Root extends Component {
           updating={updating}
           updatingFiles={updatingFiles}
           updatedFiles={updatedFiles}
+          historyBack={this.historyBack.bind(this)}
+          historyForward={this.historyForward.bind(this)}
         />
         <KeyHandler keyHandlers={keyHandlers} />
         <AppMenu />
@@ -191,6 +196,16 @@ class Root extends Component {
     let entriesEl = document.querySelector(".entries");
     let currentScrollTop = entriesEl.scrollTop;
     entriesEl.scrollTop = currentScrollTop - entriesEl.clientHeight / 2;
+  }
+
+  historyBack() {
+    let { dispatch } = this.props;
+    dispatch(ActionCreators.undo());
+  }
+
+  historyForward() {
+    let { dispatch } = this.props;
+    dispatch(ActionCreators.redo());
   }
 
   toggleFavorite() {
