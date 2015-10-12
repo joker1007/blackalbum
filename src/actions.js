@@ -122,7 +122,7 @@ export function updateDb(targetFiles: List<string>): Function {
       }
     };
 
-    const pool = new PromisePool(promiseProducer, 3)
+    const pool = new PromisePool(promiseProducer, global.config.thumbnail.concurrency || 1)
     try {
       await pool.start();
     } catch (err) {
