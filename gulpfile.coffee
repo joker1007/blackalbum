@@ -1,6 +1,7 @@
 gulp       = require('gulp')
 plugins    = require('gulp-load-plugins')()
 browserify = require('browserify')
+watchify   = require('watchify')
 babelify   = require('babelify')
 pkg        = require(__dirname + '/package.json')
 path       = require('path')
@@ -20,7 +21,7 @@ VERSION = "0.0.1"
 isProduction = ->
   env == "production"
 
-gulp.task 'build', ['html', 'sass', 'compile_main', 'compile_renderer'], ->
+gulp.task 'build', ['html', 'sass', 'compile_main', 'browserify'], ->
 
 gulp.task 'clean', (cb) ->
   del(['dist/**/*', 'build/**/*'], cb)
@@ -39,26 +40,51 @@ gulp.task 'compile_main', ->
     .pipe(plugins.sourcemaps.write('.'))
     .pipe(gulp.dest('build'))
 
-gulp.task 'compile_renderer', ->
-  gulp.src('src/**/*.{js,jsx}')
-    .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
-    .pipe(plugins.sourcemaps.init())
-    .pipe(plugins.babel({optional: ["runtime"]}))
-    .on('error', plugins.util.log)
-    .on('error', plugins.notify.onError((err) -> {title: "Babel Compile (Error)", message: "Error: #{err}"}))
-    .on('error', -> this.emit('end'))
-    .pipe(plugins.if(isProduction, plugins.uglify()))
-    .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest('build'))
-    .pipe(plugins.concat("dummy.js"))
-    .pipe(plugins.duration("compiled"))
-    .pipe(plugins.notify(title: "Babel", message: "compiled"))
+# gulp.task 'compile_renderer', ->
+  # gulp.src('src/**/*.{js,jsx}')
+    # .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
+    # .pipe(plugins.sourcemaps.init())
+    # .pipe(plugins.babel({optional: ["runtime"]}))
+    # .on('error', plugins.util.log)
+    # .on('error', plugins.notify.onError((err) -> {title: "Babel Compile (Error)", message: "Error: #{err}"}))
+    # .on('error', -> this.emit('end'))
+    # .pipe(plugins.if(isProduction, plugins.uglify()))
+    # .pipe(plugins.sourcemaps.write('.'))
+    # .pipe(gulp.dest('build'))
+    # .pipe(plugins.concat("dummy.js"))
+    # .pipe(plugins.duration("compiled"))
+    # .pipe(plugins.notify(title: "Babel", message: "compiled"))
 
 gulp.task 'browserify', ['compile_main'], ->
-  browserify('src/app.js').bundle()
-    .pipe(source("app.js"))
-    .pipe(plugins.streamify(plugins.uglify()))
-    .pipe(gulp.dest("build"))
+  compile('src/app.js', false)
+
+gulp.task 'watchify', ['compile_main'], ->
+  compile('src/app.js', true)
+
+compile = (entry, isWatch) ->
+  bundler = getBrowserify(entry, isWatch)
+  bundle = ->
+    bundler.bundle()
+      .on('error', plugins.util.log)
+      .on('error', plugins.notify.onError((err) -> {title: "Browserify Compile (Error)", message: "Error: #{err}"}))
+      .on('error', -> this.emit('end'))
+      .pipe(source("app.js"))
+      .pipe(plugins.if(isProduction, plugins.streamify(plugins.uglify())))
+      .pipe(gulp.dest("build"))
+      .pipe(plugins.notify(title: "Browserify", message: "compiled"))
+  bundler.on('update', bundle)
+  bundle()
+
+getBrowserify = (entry, isWatch) ->
+  options = {debug: !isProduction()}
+  if isWatch
+    options.cache = {}
+    options.packageCache = {}
+
+  bundler = browserify(entry, options)
+  if isWatch
+    bundler = watchify(bundler)
+  bundler
 
 gulp.task 'sass', ->
   gulp.src('sass/**/*.{sass,scss}')
@@ -104,10 +130,10 @@ gulp.task 'package:linux', ['browserify', 'html'], (done) ->
   )
 gulp.task 'package', ['package:mac', 'package:linux']
 
-gulp.task 'watch', ['build'], ->
+gulp.task 'watch', ['build', 'watchify'], ->
   electron.start()
   gulp.watch('src/main.js', ['compile_main', electron.restart])
-  gulp.watch(['src/**/*.{js,jsx}', '!src/main.js'], ['compile_renderer'])
+  # gulp.watch(['src/**/*.{js,jsx}', '!src/main.js'], ['compile_renderer'])
   gulp.watch('src/**/*.html', ['html'])
   gulp.watch('sass/**/*.{sass,scss}', ['sass'])
   gulp.watch(['index.html', 'build/**/*.{html,js,css}', 'stylesheets/**/*.css'], electron.reload)

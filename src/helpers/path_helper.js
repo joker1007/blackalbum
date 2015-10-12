@@ -11,7 +11,7 @@ export function getUserHome(): string {
 
 export const appDir = path.join(getUserHome(), ".blackalbum");
 export const configFile = path.join(appDir, "config.json");
-export const defaultThumbnailDir = path.join(appDir, "thumnails");
+export const defaultThumbnailDir = path.join(appDir, "thumbnails");
 
 
 export function fsAccess(filePath: string): Promise {

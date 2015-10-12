@@ -4,14 +4,17 @@ import ObjectPath from 'object-path';
 import { sprintf } from 'sprintf-js';
 import { parse } from 'shell-quote';
 import { fsAccess, ensureDir} from './helpers/path_helper';
+import JSZip from 'jszip';
+import pica from 'pica';
 
-let Zip = global.require('adm-zip');
-let Jimp = global.require('jimp');
-let ffmpeg = global.require('fluent-ffmpeg');
-let fs = global.require('fs');
-let path = global.require('path');
-let childProcess = global.require('child_process');
-let stat = path => {
+require("blueimp-load-image/js/load-image");
+
+const canvasBuffer = global.require('electron-canvas-to-buffer');
+const ffmpeg = global.require('fluent-ffmpeg');
+const fs = global.require('fs');
+const path = global.require('path');
+const childProcess = global.require('child_process');
+const stat = path => {
   return new Promise((resolve, reject) => {
     fs.stat(path, (err, result) => {
       if (err)
@@ -21,6 +24,50 @@ let stat = path => {
     });
   });
 };
+const readFile = path => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (err, result) => {
+      if (err)
+        return reject(err);
+
+      resolve(result);
+    });
+  });
+}
+const writeFile = (path, data) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(path, data, (err) => {
+      if (err)
+        return reject(err);
+
+      resolve();
+    });
+  });
+}
+const loadImagePromisified = (fileOrBlobOrUrl, options = {}) => {
+  return new Promise((resolve, reject) => {
+    loadImage(fileOrBlobOrUrl, (img) => {
+      if (img.type === "error") {
+        console.warn(`Error loading image ${fileOrBlobOrUrl}`);
+        reject(img);
+      } else {
+        resolve(img);
+      }
+    }, options);
+  });
+}
+const resizeCanvasPromisified = (from, to, options = {}) => {
+  return new Promise((resolve, reject) => {
+    pica.resizeCanvas(from, to, options, (err) => {
+      if (err) {
+        console.warn(`Error resize canvas`);
+        reject(err);
+      } else {
+        resolve(to);
+      }
+    });
+  });
+}
 
 const MOVIE_EXTENSIONS = [
   "3g2",
@@ -304,18 +351,39 @@ class MovieFile extends MediaFile {
 }
 
 class ArchiveFile extends MediaFile {
-  getImageEntries(zip, count) {
-    const imageEntries = _.chain(zip.getEntries())
-      .filter(entry => {
-        return _.includes(IMAGE_EXTENSIONS, path.extname(entry.name).substr(1))
-      }).sortBy('entryName').value();
+  async createThumbnail({ count, size }, force = false) {
+    try {
+      await ensureDir(this.thumbnailDir);
+      if (!force && await this.hasAllThumbnail(count))
+        return;
+
+      console.log(`create thumbnail: ${this.fullpath}`);
+
+      const targets = await this.__getImageEntries(count);
+
+      let results = [];
+      for (let i = 1; i <= targets.length; ++i) {
+        results.push(this.__processCreateThumbnail(targets[i-1], i, size, force));
+      }
+      if (_.isEmpty(results))
+        return;
+
+      await Promise.all(results);
+      return;
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  async __getImageEntries(count) {
+    const data = await readFile(this.fullpath);
+    const zip = new JSZip(data);
+    const imageEntries = zip.filter((relativePath, zo) => {
+      return _.includes(IMAGE_EXTENSIONS, path.extname(relativePath).substr(1))
+    });
     const coverEntry = _.find(imageEntries, entry => {
       return entry.name.match(/cover/i);
     });
-
-    if (_.isEmpty(imageEntries))
-        return [];
-
     const chunked = _.chain([coverEntry].concat(imageEntries))
       .compact()
       .chunk(count)
@@ -328,55 +396,39 @@ class ArchiveFile extends MediaFile {
     }
   }
 
-  async createThumbnail({ count, size }, force = false) {
+
+  async __processCreateThumbnail(target, i, size, force) {
     try {
-      await ensureDir(this.thumbnailDir);
-      if (!force && await this.hasAllThumbnail(count))
+      let hasThumbnail = await fsAccess(this.thumbnailPath(i));
+      if (!force && hasThumbnail)
         return;
 
-      console.log(`create thumbnail: ${this.fullpath}`);
+      let blob = new Blob([target.asArrayBuffer()], {type: this.getMimeType(target.name)});
+      const canvas = await loadImagePromisified(blob, {canvas: true});
 
-      const zip = new Zip(this.fullpath);
-      const targets = this.getImageEntries(zip, count);
+      let toCanvas = document.createElement('canvas');
+      toCanvas.width = parseInt(size);
+      toCanvas.height = Math.round(canvas.height / (canvas.width / parseInt(size)));
 
-
-      let results = [];
-      for (let i = 1; i <= targets.length; ++i) {
-        let hasThumbnail = await fsAccess(this.thumbnailPath(i));
-        if (!force && hasThumbnail)
-          continue;
-
-        let process = new Promise((resolve, reject) => {
-          zip.readFileAsync(targets[i-1], buf => {
-            if (!buf) {
-              reject();
-            } else {
-              resolve(buf);
-            }
-          });
-        }).then(buf => {
-          new Jimp(buf, (err, image) => {
-            if (err) {
-              console.warn(this.fullpath, err);
-              return resolve(false);
-            }
-            image
-            .scale(size / image.bitmap.width)
-            .write(this.thumbnailPath(i));
-          });
-        }).catch(() => {
-          console.warn(this.fullpath, "cannot read zip entry");
-        });
-
-        results.push(process);
-      }
-      if (_.isEmpty(results))
-        return;
-
-      await Promise.all(results);
-      return;
+      const resultCanvas = await resizeCanvasPromisified(canvas, toCanvas);
+      let buffer = canvasBuffer(toCanvas, 'image/png');
+      await writeFile(this.thumbnailPath(i), buffer);
     } catch (err) {
-      console.warn(err);
+      console.error(err);
+    }
+  }
+
+  getMimeType(name) {
+    const extname = path.extname(name).substr(1);
+    switch (extname) {
+      case "jpg":
+        return "image/jpeg";
+      case "png":
+        return "image/png";
+      case "bmp":
+        return "image/bmp";
+      default:
+        return "image/png";
     }
   }
 }
