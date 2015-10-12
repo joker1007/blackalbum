@@ -22,6 +22,7 @@ isProduction = ->
   env == "production"
 
 gulp.task 'build', ['html', 'sass', 'compile_main', 'browserify'], ->
+gulp.task 'build_for_watch', ['html', 'sass', 'compile_main', 'watchify'], ->
 
 gulp.task 'clean', (cb) ->
   del(['dist/**/*', 'build/**/*'], cb)
@@ -130,7 +131,7 @@ gulp.task 'package:linux', ['browserify', 'html'], (done) ->
   )
 gulp.task 'package', ['package:mac', 'package:linux']
 
-gulp.task 'watch', ['build', 'watchify'], ->
+gulp.task 'watch', ['build_for_watch'], ->
   electron.start()
   gulp.watch('src/main.js', ['compile_main', electron.restart])
   # gulp.watch(['src/**/*.{js,jsx}', '!src/main.js'], ['compile_renderer'])
