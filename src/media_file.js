@@ -69,7 +69,7 @@ const resizeCanvasPromisified = (from, to, options = {}) => {
   });
 }
 
-const MOVIE_EXTENSIONS = [
+const DOWNCASE_MOVIE_EXTENSIONS = [
   "3g2",
   "3gp",
   "asf",
@@ -94,11 +94,18 @@ const MOVIE_EXTENSIONS = [
   "wmv",
 ];
 
-const IMAGE_EXTENSIONS = [
+const MOVIE_EXTENSIONS = DOWNCASE_MOVIE_EXTENSIONS.concat(
+  DOWNCASE_MOVIE_EXTENSIONS.map(ext => ext.toUpperCase())
+);
+
+const DOWNCASE_IMAGE_EXTENSIONS = [
   "bmp",
   "jpg",
   "png",
-]
+];
+const IMAGE_EXTENSIONS = DOWNCASE_IMAGE_EXTENSIONS.concat(
+  DOWNCASE_IMAGE_EXTENSIONS.map(ext => ext.toUpperCase())
+);
 
 export default class MediaFile extends Record({
   id: null,
@@ -361,15 +368,9 @@ class ArchiveFile extends MediaFile {
 
       const targets = await this.__getImageEntries(count);
 
-      let results = [];
       for (let i = 1; i <= targets.length; ++i) {
-        results.push(this.__processCreateThumbnail(targets[i-1], i, size, force));
+        await this.__processCreateThumbnail(targets[i-1], i, size, force);
       }
-      if (_.isEmpty(results))
-        return;
-
-      await Promise.all(results);
-      return;
     } catch (err) {
       console.warn(err);
     }
@@ -399,22 +400,25 @@ class ArchiveFile extends MediaFile {
 
   async __processCreateThumbnail(target, i, size, force) {
     try {
-      let hasThumbnail = await fsAccess(this.thumbnailPath(i));
+      const hasThumbnail = await fsAccess(this.thumbnailPath(i));
       if (!force && hasThumbnail)
         return;
 
-      let blob = new Blob([target.asArrayBuffer()], {type: this.getMimeType(target.name)});
+      const blob = new Blob([target.asArrayBuffer()], {type: this.getMimeType(target.name)});
+      const blobUrl = global.URL.createObjectURL(blob);
       const canvas = await loadImagePromisified(blob, {canvas: true});
+      global.URL.revokeObjectURL(blobUrl);
 
-      let toCanvas = document.createElement('canvas');
+      const toCanvas = document.createElement('canvas');
       toCanvas.width = parseInt(size);
       toCanvas.height = Math.round(canvas.height / (canvas.width / parseInt(size)));
 
       const resultCanvas = await resizeCanvasPromisified(canvas, toCanvas);
-      let buffer = canvasBuffer(toCanvas, 'image/png');
+      const buffer = canvasBuffer(toCanvas, 'image/png');
       await writeFile(this.thumbnailPath(i), buffer);
     } catch (err) {
-      console.error(err);
+      console.warn(err);
+      return;
     }
   }
 

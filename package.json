@@ -59,7 +59,7 @@
     "mousetrap": "^1.5.3",
     "normalizr": "^1.1.0",
     "object-path": "^0.9.2",
-    "pica": "^1.0.7",
+    "pica": "joker1007/pica",
     "react": "^0.13.3",
     "react-immutable-proptypes": "^1.2.2",
     "react-infinite": "^0.4.1",
