@@ -18,7 +18,7 @@ export default class FileSeacher {
     const queries = searchKeyword.split(/ +/).map(word => word.split(":"));
     const result = _.reduce(queries, (files, q) => {
       if (q.length == 1)
-        return files.filter(f => this.isIncludeProperty(f, "basename", q));
+        return files.filter(f => this.isIncludeProperty(f, "basename", q[0]));
 
       switch (q[0]) {
         case "basename":
@@ -35,7 +35,11 @@ export default class FileSeacher {
   }
 
   isIncludeProperty(f: MediaFile, propertyName: string, value: string): boolean {
-    return f[propertyName].includes(value);
+    if (value.toLowerCase() === value) {
+      return f[propertyName].toLowerCase().includes(value);
+    } else {
+      return f[propertyName].includes(value);
+    }
   }
 
   predicateFile(f: MediaFile, predicate: string): boolean {
