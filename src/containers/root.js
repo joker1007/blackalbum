@@ -6,7 +6,7 @@ import ThemeManager from 'material-ui/lib/styles/theme-manager';
 import Colors from 'material-ui/lib/styles/colors';
 import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
 import DarkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme';
-import { ThemeWrapper } from 'material-ui';
+import { ThemeWrapper, Snackbar } from 'material-ui';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
@@ -50,6 +50,16 @@ class Root extends Component {
     dispatch(listFiles());
   }
 
+  componentDidUpdate() {
+    const { updatedFiles } = this.props;
+    const lastUpdatedFile = updatedFiles.last();
+    if (lastUpdatedFile) {
+      this.refs.updatedFileNotification.show();
+    } else {
+      setTimeout(() => { this.refs.updatedFileNotification.dismiss(); }, 3000);
+    }
+  }
+
   getChildContext() {
     return {
       muiTheme: customTheme,
@@ -83,6 +93,16 @@ class Root extends Component {
       'historyForward': this.historyForward.bind(this),
     };
 
+    const updatedFileNotificationMessage = updatedFiles.isEmpty() ?
+      "Update Database Complete" :
+      `Add: ${updatedFiles.last()}`;
+
+    const updatedFileNotification = (
+      <Snackbar
+        ref="updatedFileNotification"
+        message={updatedFileNotificationMessage} />
+    );
+
     return (
       <div>
         <Header
@@ -104,6 +124,7 @@ class Root extends Component {
           files={files}
           selectedFiles={selectedFiles}
           onClickHandler={this.selectFile.bind(this)} />
+        {updatedFileNotification}
       </div>
     );
   }
