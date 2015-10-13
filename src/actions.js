@@ -36,7 +36,7 @@ export const CTIME_ASC     = 'CTIME_ASC';
 export const CTIME_DESC    = 'CTIME_DESC';
 
 
-export let listFiles = createAction(LIST_FILES, async () => {
+export const listFiles = createAction(LIST_FILES, async () => {
   const files = await global.db.files.orderBy('basename').toArray();
   const data = _.map(files, f => {
     return [f.id, MediaFile.build(f)];
@@ -45,46 +45,46 @@ export let listFiles = createAction(LIST_FILES, async () => {
   return { files: mediaFiles };
 });
 
-export let requestUpdateDb = createAction(UPDATE_DB_REQUEST, async () => {
+export const requestUpdateDb = createAction(UPDATE_DB_REQUEST, async () => {
   const existFiles = await existFilesMap();
   const files = (await global.config.getTargetFiles()).filterNot(f => existFiles.has(f));
   return { files };
 });
 
-export let finishUpdate = createAction(UPDATE_FINISH, (file) => {
+export const finishUpdate = createAction(UPDATE_FINISH, (file) => {
   return {
     finish: file
   };
 });
 
-export let finishAllUpdate = createAction(UPDATE_FINISH_ALL, () => {
+export const finishAllUpdate = createAction(UPDATE_FINISH_ALL, () => {
   return {};
 });
 
-export let selectFile = createAction(SELECT_FILE, (file) => {
+export const selectFile = createAction(SELECT_FILE, (file) => {
   return { file };
 });
 
-export let multiSelectFiles = createAction(MULTI_SELECT_FILES, (files) => {
+export const multiSelectFiles = createAction(MULTI_SELECT_FILES, (files) => {
   return { files };
 });
 
-export let removeFile = createAction(REMOVE_FILE, async (file) => {
+export const removeFile = createAction(REMOVE_FILE, async (file) => {
   await global.db.files.delete(file.id);
   return { file };
 });
 
-export let setSortOrder = createAction(SET_SORT_ORDER, sortOrder => {
+export const setSortOrder = createAction(SET_SORT_ORDER, sortOrder => {
   return { sortOrder };
 });
 
-export let updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
+export const updateSearchKeyword = createAction(UPDATE_SEARCH_KEYWORD, keyword => {
   return { keyword };
 });
 
-export let regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async selectedFiles => {
-  let promises = [];
-  let { count, size } = global.config.thumbnail;
+export const regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async selectedFiles => {
+  const promises = [];
+  const { count, size } = global.config.thumbnail;
   selectedFiles.forEach(f => {
     promises.push(f.createThumbnail({ count, size }, true));
   });
@@ -94,7 +94,7 @@ export let regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async select
   )) };
 });
 
-export let favorite = createAction(FAVORITE, async selectedFiles => {
+export const favorite = createAction(FAVORITE, async selectedFiles => {
   const data = [];
   for (let f of selectedFiles.toArray()) {
     let result = await f.toggleFavorite();
@@ -108,11 +108,11 @@ export let favorite = createAction(FAVORITE, async selectedFiles => {
 export function updateDb(targetFiles: List<string>): Function {
   return async dispatch => {
     let count = 0;
-    let size = targetFiles.size;
+    const size = targetFiles.size;
     const promiseProducer = function () {
       if (count < size) {
-        let f = targetFiles.get(count);
-        let promise = addFile(f).then(() => {
+        const f = targetFiles.get(count);
+        const promise = addFile(f).then(() => {
           dispatch(finishUpdate(f));
         });
         count++;
