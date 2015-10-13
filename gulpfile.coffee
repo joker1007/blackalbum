@@ -16,7 +16,7 @@ electron = require('electron-connect').server.create()
 packager = require('electron-packager')
 
 env = process.env.NODE_ENV || "development"
-VERSION = "0.0.1"
+VERSION = pkg.version
 
 isProduction = ->
   env == "production"
