@@ -27,6 +27,8 @@ export default class FileList extends Component {
   }
 
   shouldComponentUpdate(nextProps: Object, nextState: Object): boolean {
+    if (this.state.displayHeight !== nextState.displayHeight)
+      return true;
     return !(this.files === nextProps.files);
   }
 
