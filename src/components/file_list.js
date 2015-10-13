@@ -36,12 +36,20 @@ export default class FileList extends Component {
     let { files, onClickHandler } = this.props;
     this.files = files;
     const fileComponents = files.map(f => {
-      return (
-        <FileComponent
-        key={f.id}
-        file={f}
-        onClickHandler={onClickHandler} />
-      );
+      let component = null;
+      const cached = FileList.fileComponentsCache.get(f)
+      if (cached) {
+        component = cached;
+      } else {
+        component = (
+          <FileComponent
+            key={f.id}
+            file={f}
+            onClickHandler={onClickHandler} />
+        );
+        FileList.fileComponentsCache.set(f, component);
+      }
+      return component;
     });
 
     return (
@@ -72,3 +80,5 @@ FileList.propTypes = {
   ).isRequired,
   onClickHandler: PropTypes.func.isRequired,
 };
+
+FileList.fileComponentsCache = new WeakMap();
