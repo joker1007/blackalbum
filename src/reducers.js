@@ -87,9 +87,13 @@ export const reducer = handleActions({
         _files.set(f.id, f);
       });
     });
+    const currentCursor = selectedFiles.find(f => {
+      state.currentCursor && state.currentCursor.id === f.id
+    });
     return state.merge({
       files: newFiles,
       selectedFiles: selectedFiles,
+      currentCursor: currentCursor || selectedFiles.first(),
     });
   },
   [FAVORITE]: (state, action) => {
@@ -99,9 +103,13 @@ export const reducer = handleActions({
         _files.set(f.id, f);
       });
     });
+    const currentCursor = selectedFiles.find(f => {
+      state.currentCursor && state.currentCursor.id === f.id
+    });
     return state.merge({
       files: newFiles,
       selectedFiles: selectedFiles,
+      currentCursor: currentCursor || selectedFiles.first(),
     });
   },
   [SET_CURRENT_CURSOR_OFFSET]: (state, action) => {
