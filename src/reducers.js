@@ -36,9 +36,12 @@ export const reducer = handleActions({
     });
   },
   [UPDATE_FINISH]: (state, action) => {
+    const updatedFile = action.payload.file;
+    const files = state.get("files");
     const updatedFiles = state.get("updatedFiles");
     return state.merge({
-      updatedFiles: updatedFiles.push(action.payload.finish)
+      files: files.set(updatedFile.id, updatedFile),
+      updatedFiles: updatedFiles.push(updatedFile.fullpath),
     });
   },
   [UPDATE_SEARCH_KEYWORD]: (state, action) => {

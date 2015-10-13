@@ -217,6 +217,13 @@ export default class MediaFile extends Record({
     });
   }
 
+  async save() {
+    const dbData = await this.toDbData();
+    await global.db.files.add(dbData);
+    const fromDb = await global.db.files.where("fullpath").equals(this.fullpath).first();
+    return MediaFile.build(fromDb);
+  }
+
   async toDbData() {
     return {
       basename: this.basename,

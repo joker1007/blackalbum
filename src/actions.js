@@ -53,9 +53,7 @@ export const requestUpdateDb = createAction(UPDATE_DB_REQUEST, async () => {
 });
 
 export const finishUpdate = createAction(UPDATE_FINISH, (file) => {
-  return {
-    finish: file
-  };
+  return { file };
 });
 
 export const finishAllUpdate = createAction(UPDATE_FINISH_ALL, () => {
@@ -117,8 +115,8 @@ export function updateDb(targetFiles: List<string>): Function {
     const promiseProducer = function () {
       if (count < size) {
         const f = targetFiles.get(count);
-        const promise = addFile(f).then(() => {
-          dispatch(finishUpdate(f));
+        const promise = addFile(f).then((mediaFile) => {
+          dispatch(finishUpdate(mediaFile));
         });
         count++;
         return promise;
@@ -144,11 +142,11 @@ async function addFile(f) {
     let mediaFile = await MediaFile.buildByFileAsync(f);
     let isPersisted = await mediaFile.isPersistedAsync();
     if (!isPersisted) {
-      let dbData = await mediaFile.toDbData();
-      global.db.files.add(dbData);
+      mediaFile = await mediaFile.save();
     }
     let { count, size } = global.config.thumbnail;
-    return mediaFile.createThumbnail({ count, size });
+    await mediaFile.createThumbnail({ count, size });
+    return mediaFile;
   } catch (err) {
     console.warn(f, err);
   }
