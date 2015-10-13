@@ -93,7 +93,6 @@ export const reducer = handleActions({
   },
   [FAVORITE]: (state, action) => {
     const { selectedFiles } = action.payload;
-    console.log(selectedFiles.toJS());
     const newFiles = state.get("files").withMutations(_files => {
       selectedFiles.forEach(f => {
         _files.set(f.id, f);
