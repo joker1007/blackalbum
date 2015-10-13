@@ -12,6 +12,7 @@ import {
   SET_SORT_ORDER,
   REGENERATE_THUMBNAIL,
   FAVORITE,
+  SET_CURRENT_CURSOR_OFFSET,
   FILENAME_ASC
 } from './actions';
 
@@ -103,6 +104,11 @@ export const reducer = handleActions({
       selectedFiles: selectedFiles,
     });
   },
+  [SET_CURRENT_CURSOR_OFFSET]: (state, action) => {
+    return state.merge({
+      currentCursorOffset: action.payload.offset,
+    })
+  }
 }, new ImmutableMap({
   files: new OrderedMap(),
   updating: false,
@@ -111,5 +117,6 @@ export const reducer = handleActions({
   searchKeyword: "",
   selectedFiles: new ImmutableMap(),
   currentCursor: null,
+  currentCursorOffset: 0,
   sortOrder: FILENAME_ASC,
 }));

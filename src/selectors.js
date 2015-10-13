@@ -15,6 +15,7 @@ export const searchKeywordSelector: (state: Object) => string                  =
 export const selectedFilesSelector: (state: Object) => ImmutableMap<MediaFile> = state => state.present.get("selectedFiles");
 export const sortOrderSelector: (state: Object)     => string                  = state => state.present.get("sortOrder");
 export const currentCursorSelector: (state: Object) => ?MediaFile              = state => state.present.get("currentCursor");
+export const currentCursorOffsetSelector: (state: Object) => number            = state => state.present.get("currentCursorOffset");
 
 const visibleFiles = (files: OrderedMap, searchKeyword: string) => {
   const searcher = new FileSeacher(files);
@@ -97,7 +98,8 @@ export const allSelector = createSelector(
   composedUpdatingSelector,
   selectedFilesSelector,
   currentCursorSelector,
-  ({files, searchKeyword, sortOrder}, {updating, updatingFiles, updatedFiles}, selectedFiles, currentCursor) => (
+  currentCursorOffsetSelector,
+  ({files, searchKeyword, sortOrder}, {updating, updatingFiles, updatedFiles}, selectedFiles, currentCursor, currentCursorOffset) => (
     {
       files,
       searchKeyword,
@@ -107,6 +109,7 @@ export const allSelector = createSelector(
       updatedFiles,
       selectedFiles,
       currentCursor,
+      currentCursorOffset,
     }
   )
 );

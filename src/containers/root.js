@@ -17,7 +17,8 @@ import {
   removeFile,
   setSortOrder,
   multiSelectFiles,
-  favorite
+  favorite,
+  setCurrentCursorOffset
 } from '../actions';
 import { ActionCreators } from 'redux-undo';
 import { allSelector } from '../selectors';
@@ -112,7 +113,7 @@ class Root extends Component {
     dispatch(updateSearchKeyword(keyword));
   }
 
-  selectFile(e: {shiftKey: boolean}, file: MediaFile) {
+  selectFile(e: {shiftKey: boolean}, file: MediaFile, offset: number) {
     let { dispatch, selectedFiles } = this.props;
     if (!selectedFiles.isEmpty() && e.shiftKey) {
       let { files, currentCursor } = this.props;
@@ -122,6 +123,7 @@ class Root extends Component {
       dispatch(multiSelectFiles(files.slice(begin, end + 1)));
     } else {
       dispatch(selectFile(file));
+      dispatch(setCurrentCursorOffset(offset));
     }
   }
 
@@ -151,26 +153,31 @@ class Root extends Component {
 
   moveDownCursor(e) {
     e.preventDefault();
-    let { dispatch, files, currentCursor } = this.props;
+    let { dispatch, files, currentCursor, currentCursorOffset } = this.props;
     let selectedFileIndex = currentCursor ? files.indexOf(currentCursor) : -1;
     let nextFile: ?MediaFile = files.get(selectedFileIndex + 1);
     if (nextFile) {
       dispatch(selectFile(nextFile));
       let entriesEl = document.querySelector(".entries");
-      let currentScrollTop = entriesEl.scrollTop;
-      entriesEl.scrollTop = currentScrollTop + global.config.entryContainerHeight;
+      let nextOffset = Math.max(currentCursorOffset + global.config.entryContainerHeight, 0);
+      let nextScroll = Math.max(currentCursorOffset + global.config.entryContainerHeight * 0.5, 0)
+      entriesEl.scrollTop = nextScroll;
+      dispatch(setCurrentCursorOffset(nextOffset));
     }
   }
 
   moveUpCursor() {
-    let { dispatch, files, currentCursor } = this.props;
+    let { dispatch, files, currentCursor, currentCursorOffset } = this.props;
     let selectedFileIndex = currentCursor ? files.indexOf(currentCursor) : 1;
+    if (selectedFileIndex <= 0)
+      return;
     let nextFile: ?MediaFile = files.get(selectedFileIndex - 1);
     if (nextFile) {
       dispatch(selectFile(nextFile));
       let entriesEl = document.querySelector(".entries");
-      let currentScrollTop = entriesEl.scrollTop;
-      entriesEl.scrollTop = currentScrollTop - global.config.entryContainerHeight;
+      let nextOffset = Math.max(currentCursorOffset - global.config.entryContainerHeight, 0);
+      entriesEl.scrollTop = nextOffset;
+      dispatch(setCurrentCursorOffset(nextOffset));
     }
   }
 

@@ -106,8 +106,10 @@ class FileComponent extends Component {
 
   selectFile(e: Object): void {
     e.preventDefault();
-    let { file, onClickHandler } = this.props;
-    onClickHandler(e, file);
+    const dom = React.findDOMNode(this);
+    const { file, onClickHandler } = this.props;
+    const parentOffset = document.querySelector(".entries").offsetTop
+    onClickHandler(e, file, dom.offsetTop - parentOffset);
   }
 }
 
