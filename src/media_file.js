@@ -6,8 +6,7 @@ import { parse } from 'shell-quote';
 import { fsAccess, ensureDir} from './helpers/path_helper';
 import JSZip from 'jszip';
 import pica from 'pica';
-
-require("blueimp-load-image/js/load-image");
+import loadImage from "load-image";
 
 const canvasBuffer = global.require('electron-canvas-to-buffer');
 const ffmpeg = global.require('fluent-ffmpeg');
