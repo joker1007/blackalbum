@@ -12,17 +12,9 @@ let middlewares = [thunk, promiseMiddleware];
 
 if (process.env.NODE_ENV !== "production") {
   middlewares.push(createLogger());
-
-  const { devTools, persistState } = require('redux-devtools');
-  var createStoreWithMiddleware = compose(
-    applyMiddleware(...middlewares),
-    devTools(),
-    persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/))
-  )(createStore);
-} else {
-  var createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
 }
 
+var createStoreWithMiddleware = applyMiddleware(...middlewares)(createStore);
 export default function configureStore(initialState) {
   const store = createStoreWithMiddleware(undoable(reducer, {
     limit: 10,

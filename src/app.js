@@ -23,31 +23,15 @@ global.config = loadConfig();
 const store = configureStore({});
 
 document.addEventListener('DOMContentLoaded', () => {
-  const rootEl = document.getElementById('main');
-  if (process.env.NODE_ENV !== "production") {
-    const { DevTools, DebugPanel, LogMonitor } = require('redux-devtools/lib/react');
-    React.render(
-      <div>
-        <Provider store={store}>
-          {() => <Root />}
-        </Provider>
-        <DebugPanel top right bottom>
-          <DevTools store={store} monitor={LogMonitor} visibleOnLoad={false} />
-        </DebugPanel>
-      </div>
-      ,
-      rootEl
-    );
-  } else {
-    React.render(
-      <div>
-        <Provider store={store}>
-          {() => <Root />}
-        </Provider>
-      </div>
-      ,
-      rootEl
-    );
-  }
+const rootEl = document.getElementById('main');
+  React.render(
+    <div>
+      <Provider store={store}>
+        {() => <Root />}
+      </Provider>
+    </div>
+    ,
+    rootEl
+  );
 });
 
