@@ -10,9 +10,24 @@ export function getUserHome(): string {
 }
 
 export const appDir = path.join(getUserHome(), ".blackalbum");
-export const configFile = path.join(appDir, "config.json");
+export const yamlConfigFile = path.join(appDir, "config.yml");
+export const jsonConfigFile = path.join(appDir, "config.json");
 export const defaultThumbnailDir = path.join(appDir, "thumbnails");
 
+export function configFile(): string {
+  try {
+    fs.accessSync(yamlConfigFile);
+    return yamlConfigFile;
+  } catch (err) {
+    try {
+      fs.accessSync(jsonConfigFile);
+      return jsonConfigFile;
+    } catch (err) {
+      console.log("configerror");
+      throw err;
+    }
+  }
+}
 
 export function fsAccess(filePath: string): Promise {
   return new Promise((resolve, reject) => {

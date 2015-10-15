@@ -1,3 +1,5 @@
+/* flow */
+
 import { defaultThumbnailDir } from './helpers/path_helper';
 import _ from 'lodash';
 import { List } from 'immutable';
@@ -17,12 +19,14 @@ let glob = path => {
 
 export default class Config {
   targetDirectories: Array<string>;
-  extensions: {[key: string]: Object};
+  players: {[key: string]: string};
+  extensions: {[key: string]: Array<string>};
   thumbnail: {dir: string, count: number, size: number};
   filterWords: Array<string>;
 
-  constructor({ directories, extensions, thumbnail, filterWords }: Object) {
+  constructor({ directories, players, extensions, thumbnail, filterWords }: Object) {
     this.targetDirectories = directories || [];
+    this.players = players || {};
     this.extensions = extensions || {};
     let {directory, count, size } = thumbnail || {};
     this.thumbnail = thumbnail || {};
@@ -45,16 +49,16 @@ export default class Config {
   }
 
   getAllCommands(extname: string): {[key: string]: string} {
-    return this.extensions[extname]
+    return _.pick(this.players, (cmd, name) => (_.includes(this.extensions[extname], name)))
   }
 
   getCommand(extname: string): string {
-    let commands = this.getAllCommands(extname);
-    return commands[Object.keys(commands)[0]];
+    const playerName = this.extensions[extname][0];
+    return this.players[playerName];
   }
 
   getCommandNames(extname: string): Array<string> {
-    return Object.keys(this.extensions[extname]);
+    return this.extensions[extname];
   }
 
   async getTargetFiles(): List<string> {

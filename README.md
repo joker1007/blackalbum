@@ -24,38 +24,38 @@ Write config file at `~/.blackalbum/config.json`.
 
 ### Sample
 
-```json
-{
-  "directories": [
-    "/Users/joker/pasokara_test_data"
-  ],
-  "extensions": {
-    "avi": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    },
-    "mkv": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    },
-    "mp4": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    },
-    "mpg": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    },
-    "mov": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    },
-    "wmv": {
-      "mplayer": "open -a \"/Users/joker/Applications/MPlayer OSX Extended.app\"",
-      "vlc": "open -a \"/Users/joker/Applications/VLC.app\""
-    }
-  }
-}
+```yaml
+directories:
+  - "/path/to/target/directory"
+filterWords:
+  - NGWORD
+thumbnail:
+  concurrency: 3
+players:
+  mplayer: open -a "/Applications/MPlayer OSX Extended.app"
+  vlc: open -a "/Applications/VLC.app"
+  cooViewer: open -a "/Applications/cooViewer.app"
+extensions:
+  avi:
+    - mplayer
+    - vlc
+  mkv:
+    - mplayer
+    - vlc
+  mp4:
+    - mplayer
+    - vlc
+  m4v:
+    - mplayer
+    - vlc
+  mpg:
+    - mplayer
+    - vlc
+  wmv:
+    - mplayer
+    - vlc
+  zip:
+    - cooViewer
 ```
 
 And click menu `Tool -> Update Database`.

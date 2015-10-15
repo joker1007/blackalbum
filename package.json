@@ -57,6 +57,7 @@
     "glob": "^5.0.15",
     "humanize": "0.0.9",
     "immutable": "^3.7.5",
+    "js-yaml": "^3.4.3",
     "jszip": "^2.5.0",
     "key-string": "0.0.2",
     "lodash": "^3.10.1",
