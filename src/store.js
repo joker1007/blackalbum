@@ -23,5 +23,17 @@ export default function configureStore(initialState) {
     }
   }));
 
+  if (module.onReload) {
+    module.onReload(() => {
+      const nextReducer = undoable(require('./reducers'), {
+        limit: 10,
+        filter: (action, currentState, previousState) => {
+          return action.type === UPDATE_SEARCH_KEYWORD;
+        }
+      });
+      store.replaceReducer(nextReducer);
+    });
+  }
+
   return store;
 }
