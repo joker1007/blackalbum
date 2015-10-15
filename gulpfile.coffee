@@ -9,6 +9,8 @@ process    = require('process')
 _          = require('lodash')
 del        = require('del')
 
+childProcess = require('child_process')
+
 es         = require('event-stream')
 source     = require('vinyl-source-stream')
 
@@ -110,6 +112,14 @@ gulp.task 'html', ->
     .pipe(plugins.preprocess({context: {NODE_ENV: env}}))
     .pipe(gulp.dest('build'))
 
+
+INCLUDE_MODULES = [
+  "fs-extra",
+  "glob",
+  "fluent-ffmpeg",
+  "electron-canvas-to-buffer",
+]
+console.log()
 packageConfig = {
   name: "BlackAlbum"
   dir: "."
@@ -117,16 +127,24 @@ packageConfig = {
   arch: "x64"
   version: "0.33.7"
   prune: true
-  ignore: /(^\/node_modules\/(?!fs-extra|glob|fluent-ffmpeg|electron-canvas-to-buffer).*|gulpfile\.coffee|src|sass|.*\.map)/
+  ignore: new RegExp("(^\/node_modules\/(?!#{INCLUDE_MODULES.join("|")}).*|gulpfile\.coffee|src|sass|.*\.map)")
   asar: true
   overwrite: true
   "app-version": VERSION
 }
-gulp.task 'package:mac', ['browserify', 'html'], (done) ->
+gulp.task 'install_include_npm', (done) ->
+  cwd = process.cwd()
+  _.each INCLUDE_MODULES, (m) ->
+    process.chdir("./node_modules/#{m}")
+    childProcess.execFileSync("npm", ["install", "--only=production"])
+    process.chdir(cwd)
+  done()
+
+gulp.task 'package:mac', ['browserify', 'html', 'install_include_npm'], (done) ->
   packager(_.extend({}, packageConfig, platform: "darwin"), (err, path) ->
     done()
   )
-gulp.task 'package:linux', ['browserify', 'html'], (done) ->
+gulp.task 'package:linux', ['browserify', 'html', 'install_include_npm'], (done) ->
   packager(_.extend({}, packageConfig, platform: "linux"), (err, path) ->
     done()
   )
