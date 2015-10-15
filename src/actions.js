@@ -22,6 +22,8 @@ export const REMOVE_FILE = 'REMOVE_FILE';
 export const SET_SORT_ORDER = 'SET_SORT_ORDER';
 export const REGENERATE_THUMBNAIL = 'REGENERATE_THUMBNAIL';
 export const FAVORITE = 'FAVORITE';
+export const SAVE_SEARCH_PRESET = 'SAVE_SEARCH_PRESET';
+export const DELETE_SEARCH_PRESET = 'DELETE_SEARCH_PRESET';
 export const SET_CURRENT_CURSOR_OFFSET = 'SET_CURRENT_CURSOR_OFFSET';
 
 /*
@@ -103,6 +105,20 @@ export const favorite = createAction(FAVORITE, async selectedFiles => {
 
   return { selectedFiles: newFiles };
 })
+
+export const saveSearchPreset = createAction(SAVE_SEARCH_PRESET, (preset) => {
+  const searchPresets = JSON.parse(global.localStorage.getItem("searchPresets")) || {};
+  const newPresets = Object.assign({}, searchPresets, preset);
+  global.localStorage.setItem("searchPresets", JSON.stringify(newPresets));
+  return { newPreset: preset };
+});
+
+export const deleteSearchPreset = createAction(DELETE_SEARCH_PRESET, (presetName) => {
+  const searchPresets = JSON.parse(global.localStorage.getItem("searchPresets")) || {};
+  const newPresets = _.omit(searchPresets, presetName);
+  global.localStorage.setItem("searchPresets", JSON.stringify(newPresets));
+  return { presetName };
+});
 
 export const setCurrentCursorOffset = createAction(SET_CURRENT_CURSOR_OFFSET, offset => {
   return { offset };

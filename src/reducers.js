@@ -12,9 +12,15 @@ import {
   SET_SORT_ORDER,
   REGENERATE_THUMBNAIL,
   FAVORITE,
+  SAVE_SEARCH_PRESET,
+  DELETE_SEARCH_PRESET,
   SET_CURRENT_CURSOR_OFFSET,
   FILENAME_ASC
 } from './actions';
+
+const initialSearchPresets = new OrderedMap(
+  JSON.parse(global.localStorage.getItem("searchPresets") || "{}")
+);
 
 export const reducer = handleActions({
   [LIST_FILES]: (state,  action) => {
@@ -115,6 +121,20 @@ export const reducer = handleActions({
       currentCursor: currentCursor || selectedFiles.first(),
     });
   },
+  [SAVE_SEARCH_PRESET]: (state, action) => {
+    const searchPresets = state.get("searchPresets");
+    return state.merge({
+      searchPresets: searchPresets.merge(action.payload.newPreset),
+    });
+  },
+  [DELETE_SEARCH_PRESET]: (state, action) => {
+    const searchPresets = state.get("searchPresets");
+    console.log(searchPresets.toJS());
+    console.log(action.payload.presetName);
+    return state.merge({
+      searchPresets: searchPresets.delete(action.payload.presetName),
+    });
+  },
   [SET_CURRENT_CURSOR_OFFSET]: (state, action) => {
     return state.merge({
       currentCursorOffset: action.payload.offset,
@@ -130,4 +150,5 @@ export const reducer = handleActions({
   currentCursor: null,
   currentCursorOffset: 0,
   sortOrder: FILENAME_ASC,
+  searchPresets: initialSearchPresets,
 }));

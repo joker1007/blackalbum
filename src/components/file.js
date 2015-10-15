@@ -114,7 +114,7 @@ class FileComponent extends Component {
               {thumbnails}
             </div>
           </div>
-          <div className="info selectable">
+          <div className="info">
             {info}
           </div>
         </div>

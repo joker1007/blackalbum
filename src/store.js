@@ -25,7 +25,7 @@ export default function configureStore(initialState) {
 
   if (module.onReload) {
     module.onReload(() => {
-      const nextReducer = undoable(require('./reducers'), {
+      const nextReducer = undoable(require('./reducers').reducer, {
         limit: 10,
         filter: (action, currentState, previousState) => {
           return action.type === UPDATE_SEARCH_KEYWORD;

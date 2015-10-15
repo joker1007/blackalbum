@@ -1,5 +1,7 @@
-@import "sweetalert/dist/sweetalert";
+$collection-bg-color: #303030;
 
+@import "sweetalert/dist/sweetalert";
+@import "materialize-css/sass/materialize.scss";
 
 @font-face {
   font-family: 'Material Icons';
@@ -7,9 +9,9 @@
   font-weight: 400;
   src: local('Material Icons'),
     local('MaterialIcons-Regular'),
-    url(../fonts/MaterialIcons-Regular.woff) format('woff2'),
-    url(../fonts/MaterialIcons-Regular.woff) format('woff'),
-    url(../fonts/MaterialIcons-Regular.ttf) format('truetype');
+    url(../font/MaterialIcons-Regular.woff) format('woff2'),
+    url(../font/MaterialIcons-Regular.woff) format('woff'),
+    url(../font/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
@@ -68,8 +70,12 @@ header {
 
   .search {
     flex: 0 0 360px;
-    margin-right: 10px;
     display: block;
+
+    input[type=text]:focus {
+      border-bottom: 0;
+      box-shadow: 0 0 0 0;
+    }
   }
 
   .sort {
@@ -155,12 +161,24 @@ header {
 
       padding-left:: 4px {}
 
-      flex: 0 0 220px;
+      flex: 0 0 230px;
+
+      td {
+        padding-top: 2px;
+        padding-bottom: 2px;
+      }
 
       .info--name {
         font-weight: bold;
         text-align: right;
       }
     }
+  }
+}
+
+.new_preset_form {
+  input[type=text]:focus {
+    border-bottom: 0;
+    box-shadow: 0 0 0 0;
   }
 }

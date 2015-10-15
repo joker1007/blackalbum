@@ -18,6 +18,8 @@ import {
   setSortOrder,
   multiSelectFiles,
   favorite,
+  saveSearchPreset,
+  deleteSearchPreset,
   setCurrentCursorOffset
 } from '../actions';
 import { ActionCreators } from 'redux-undo';
@@ -75,7 +77,8 @@ class Root extends Component {
       updatedFiles,
       searchKeyword,
       selectedFiles,
-      sortOrder
+      sortOrder,
+      searchPresets,
     } = this.props;
 
     const keyHandlers = {
@@ -107,8 +110,9 @@ class Root extends Component {
       <div>
         <Header
           searchKeyword={searchKeyword}
+          searchPresets={searchPresets}
           sortOrder={sortOrder}
-          searchFormChangeHandler={this.searchFormChangeHandler.bind(this)}
+          updateSearchKeyword={this.updateSearchKeyword.bind(this)}
           sortSelectChangeHandler={this.changeSortOrder.bind(this)}
           fileCount={files.size}
           updating={updating}
@@ -116,6 +120,8 @@ class Root extends Component {
           updatedFiles={updatedFiles}
           historyBack={this.historyBack.bind(this)}
           historyForward={this.historyForward.bind(this)}
+          saveSearchPresetHandler={this.saveSearchPresetHandler.bind(this)}
+          deleteSearchPresetHandler={this.deleteSearchPresetHandler.bind(this)}
         />
         <KeyHandler keyHandlers={keyHandlers} />
         <AppMenu />
@@ -129,7 +135,7 @@ class Root extends Component {
     );
   }
 
-  searchFormChangeHandler(keyword: string) {
+  updateSearchKeyword(keyword: string) {
     let { dispatch } = this.props;
     dispatch(updateSearchKeyword(keyword));
   }
@@ -239,6 +245,16 @@ class Root extends Component {
   toggleFavorite() {
     let { dispatch, selectedFiles } = this.props;
     dispatch(favorite(selectedFiles));
+  }
+
+  saveSearchPresetHandler(preset) {
+    let { dispatch } = this.props;
+    dispatch(saveSearchPreset(preset));
+  }
+
+  deleteSearchPresetHandler(presetName) {
+    let { dispatch } = this.props;
+    dispatch(deleteSearchPreset(presetName));
   }
 }
 

@@ -39,7 +39,7 @@ export default class SearchTextField extends Component {
         value={this.state.searchKeyword}
         hintText="basename:foo fullpath:dir1 is:favorited"
         onChange={this.onChange.bind(this)}
-        className="search" />
+        className="search no-border" />
     );
   }
 

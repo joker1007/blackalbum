@@ -56,6 +56,7 @@
     "livereactload": "^2.0.1",
     "lodash": "^3.10.1",
     "material-ui": "^0.12.3",
+    "materialize-css": "^0.97.1",
     "moment": "^2.10.6",
     "mousetrap": "^1.5.3",
     "node-sass": "^3.3.3",
