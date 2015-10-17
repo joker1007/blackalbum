@@ -129,8 +129,6 @@ export const reducer = handleActions({
   },
   [DELETE_SEARCH_PRESET]: (state, action) => {
     const searchPresets = state.get("searchPresets");
-    console.log(searchPresets.toJS());
-    console.log(action.payload.presetName);
     return state.merge({
       searchPresets: searchPresets.delete(action.payload.presetName),
     });
