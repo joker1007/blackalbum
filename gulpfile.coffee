@@ -126,8 +126,8 @@ packageConfig = {
   arch: "x64"
   version: "0.34.0"
   prune: true
-  ignore: new RegExp("(^\/node_modules\/(?!#{INCLUDE_MODULES.join("|")}).*|gulpfile\.coffee|^src/.*|^sass/.*|.*\.js\.map$)")
-  asar: false
+  ignore: new RegExp("(^\/node_modules\/(?!#{INCLUDE_MODULES.join("|")}).*|gulpfile\.coffee|^dist/.*|^src/.*|^sass/.*|.*\.js\.map$)")
+  asar: true
   overwrite: true
   "app-version": VERSION
 }
