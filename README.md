@@ -4,7 +4,7 @@
 Movie Media Browser by Electron
 
 ## Screenshot
-![blackalbum.png](https://cloud.githubusercontent.com/assets/116996/10122588/7003cb2a-6559-11e5-8755-e1819265a002.png)
+<img width="1200" alt="blackalbum.png" src="https://cloud.githubusercontent.com/assets/116996/10564504/28bcbcb4-75f2-11e5-8010-d011edced361.png">
 
 ## Requirements
 - ffmpegthumbnailer
