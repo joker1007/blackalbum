@@ -4,12 +4,9 @@ let path = global.require('path');
 let fs = global.require('fs');
 let fsExtra = global.require('fs-extra');
 let process = global.require('process');
+let app = global.require('remote').require('app');
 
-export function getUserHome(): string {
-  return process.env.HOME || process.env.USERPROFILE;
-}
-
-export const appDir = path.join(getUserHome(), ".blackalbum");
+export const appDir = app.getPath('userData');
 export const yamlConfigFile = path.join(appDir, "config.yml");
 export const jsonConfigFile = path.join(appDir, "config.json");
 export const defaultThumbnailDir = path.join(appDir, "thumbnails");
