@@ -36,7 +36,6 @@ app.on('ready', function() {
     windowSize = {width: 1024, height: 600};
   }
 
-  console.log(windowSize);
   // Create the browser window.
   global.mainWindow = new BrowserWindow(windowSize);
 
