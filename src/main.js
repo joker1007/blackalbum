@@ -1,6 +1,8 @@
 let app = require('app');  // Module to control application life.
 let BrowserWindow = require('browser-window');  // Module to create native browser window.
 let process = require('process');
+let path = require('path');
+let fs = require('fs');
 
 // avoid https://github.com/atom/electron/issues/550
 if (process.platform == "darwin") {
@@ -26,14 +28,27 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+  let windowSizePath = path.join(app.getPath('userData'), 'window-size.json');
+  let windowSize;
+  try {
+    windowSize = JSON.parse(fs.readFileSync(windowSizePath, 'utf8'));
+  } catch (err) {
+    windowSize = {width: 1024, height: 600};
+  }
+
+  console.log(windowSize);
   // Create the browser window.
-  global.mainWindow = new BrowserWindow({width: 1024, height: 600});
+  global.mainWindow = new BrowserWindow(windowSize);
 
   // and load the index.html of the app.
   global.mainWindow.loadUrl('file://' + __dirname + '/index.html');
 
+  global.mainWindow.on('close', () => {
+    fs.writeFileSync(windowSizePath, JSON.stringify(mainWindow.getBounds()));
+  });
+
   // Emitted when the window is closed.
-  global.mainWindow.on('closed', function() {
+  global.mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
