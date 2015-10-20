@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import swal from 'sweetalert';
 import { requestUpdateDb, updateDb } from '../actions';
-import menuTemplate from './menu_template';
+import menuTemplate from '../menu_template';
 
 let remote = global.require('remote');
 let Menu = remote.require('menu');
@@ -38,7 +38,7 @@ class AppMenu extends Component {
                 confirmButtonText: "Yes, Clear",
                 closeOnConfirm: true,
                 html: false,
-              }, () =>{
+              }, () => {
                 indexedDB.deleteDatabase("blackalbum");
                 window.location.reload();
               });
