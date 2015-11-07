@@ -1,6 +1,7 @@
 /* @flow */
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import Dexie from 'dexie';
 import configureStore from './store';
@@ -24,10 +25,10 @@ const store = configureStore({});
 
 document.addEventListener('DOMContentLoaded', () => {
 const rootEl = document.getElementById('main');
-  React.render(
+  ReactDOM.render(
     <div>
       <Provider store={store}>
-        {() => <Root />}
+        <Root />
       </Provider>
     </div>
     ,

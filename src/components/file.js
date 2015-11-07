@@ -1,6 +1,7 @@
 /* @flow */
 
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { parse } from 'shell-quote';
@@ -57,51 +58,55 @@ class FileComponent extends Component {
     if (file.isMovie) {
       info = (
         <table>
-          <tr>
-            <td className="info--name">Duration:</td>
-            <td>{file.durationStr}</td>
-          </tr>
-          <tr>
-            <td className="info--name">VCodec:</td>
-            <td>{file.vcodec}</td>
-          </tr>
-          <tr>
-            <td className="info--name">ACodec:</td>
-            <td>{file.acodec}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Res:</td>
-            <td>{file.resolution}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Size:</td>
-            <td>{humanize.filesize(file.filesize)}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Ctime:</td>
-            <td>{humanize.date('Y-m-d H:i:s', file.ctime)}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Favorited:</td>
-            <td>{favorited}</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td className="info--name">Duration:</td>
+              <td>{file.durationStr}</td>
+            </tr>
+            <tr>
+              <td className="info--name">VCodec:</td>
+              <td>{file.vcodec}</td>
+            </tr>
+            <tr>
+              <td className="info--name">ACodec:</td>
+              <td>{file.acodec}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Res:</td>
+              <td>{file.resolution}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Size:</td>
+              <td>{humanize.filesize(file.filesize)}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Ctime:</td>
+              <td>{humanize.date('Y-m-d H:i:s', file.ctime)}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Favorited:</td>
+              <td>{favorited}</td>
+            </tr>
+          </tbody>
         </table>
       );
     } else {
       info = (
         <table>
-          <tr>
-            <td className="info--name">Size:</td>
-            <td>{humanize.filesize(file.filesize)}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Ctime:</td>
-            <td>{humanize.date('Y-m-d H:i:s', file.ctime)}</td>
-          </tr>
-          <tr>
-            <td className="info--name">Favorited:</td>
-            <td>{favorited}</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td className="info--name">Size:</td>
+              <td>{humanize.filesize(file.filesize)}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Ctime:</td>
+              <td>{humanize.date('Y-m-d H:i:s', file.ctime)}</td>
+            </tr>
+            <tr>
+              <td className="info--name">Favorited:</td>
+              <td>{favorited}</td>
+            </tr>
+          </tbody>
         </table>
       );
     }
@@ -135,7 +140,7 @@ class FileComponent extends Component {
 
   selectFile(e: Object): void {
     e.preventDefault();
-    const dom = React.findDOMNode(this);
+    const dom = ReactDOM.findDOMNode(this);
     const { file, onClickHandler } = this.props;
     const parentOffset = document.querySelector(".entries").offsetTop
     onClickHandler(e, file, dom.offsetTop - parentOffset);

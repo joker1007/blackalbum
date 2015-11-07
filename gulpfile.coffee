@@ -91,7 +91,7 @@ getBrowserify = (entry, isWatch) ->
 
   bundler = browserify(entry, options)
   if isWatch
-    bundler = watchify(bundler.plugin(livereactload))
+    bundler = watchify(bundler)
   bundler
 
 gulp.task 'sass', ->
@@ -147,6 +147,6 @@ gulp.task 'watch', ['build_for_watch'], ->
   # gulp.watch(['src/**/*.{js,jsx}', '!src/main.js'], ['compile_renderer'])
   gulp.watch('src/**/*.html', ['html'])
   gulp.watch('sass/**/*.{sass,scss}', ['sass'])
-  gulp.watch(['index.html', 'build/**/*.{html,css}', 'stylesheets/**/*.css'], electron.reload)
+  gulp.watch(['index.html', 'build/**/*.{html,js,css}', 'stylesheets/**/*.css'], electron.reload)
 
 gulp.task 'default', ['build']
