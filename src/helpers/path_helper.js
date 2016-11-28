@@ -4,7 +4,7 @@ let path = global.require('path');
 let fs = global.require('fs');
 let fsExtra = global.require('fs-extra');
 let process = global.require('process');
-let app = global.require('remote').require('app');
+let app = global.require('electron').remote.app;
 
 export const appDir = app.getPath('userData');
 export const yamlConfigFile = path.join(appDir, "config.yml");

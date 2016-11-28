@@ -1,5 +1,6 @@
-let app = require('app');  // Module to control application life.
-let BrowserWindow = require('browser-window');  // Module to create native browser window.
+let electron = require('electron');
+let app = electron.app;  // Module to control application life.
+let BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 let process = require('process');
 let path = require('path');
 let fs = require('fs');
@@ -8,9 +9,6 @@ let fs = require('fs');
 if (process.platform == "darwin") {
   process.env['PATH'] = "/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 }
-
-// Report crashes to our server.
-require('crash-reporter').start();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -40,7 +38,7 @@ app.on('ready', function() {
   global.mainWindow = new BrowserWindow(windowSize);
 
   // and load the index.html of the app.
-  global.mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  global.mainWindow.loadURL('file://' + __dirname + '/index.html');
 
   global.mainWindow.on('close', () => {
     fs.writeFileSync(windowSizePath, JSON.stringify(mainWindow.getBounds()));

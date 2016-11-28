@@ -5,8 +5,8 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { regenerateThumbnail } from '../actions';
 
-let remote = global.require('remote');
-let Menu = remote.require('menu');
+let remote = global.require('electron').remote;
+let Menu = remote.Menu;
 
 class ContextMenu extends Component {
   componentDidMount() {

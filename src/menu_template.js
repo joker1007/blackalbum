@@ -1,4 +1,4 @@
-const remote = global.require('remote');
+const remote = global.require('electron').remote;
 const process = global.require('process');
 
 const template = [
@@ -98,7 +98,7 @@ const template = [
 ];
 
 if (process.platform == 'darwin') {
-  let app = remote.require('app')
+  let app = remote.app;
   let name = app.getName();
   template.unshift({
     label: name,

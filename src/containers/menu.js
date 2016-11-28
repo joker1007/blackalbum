@@ -6,8 +6,8 @@ import swal from 'sweetalert';
 import { requestUpdateDb, updateDb } from '../actions';
 import menuTemplate from '../menu_template';
 
-let remote = global.require('remote');
-let Menu = remote.require('menu');
+let remote = global.require('electron').remote;
+let Menu = remote.Menu;
 
 class AppMenu extends Component {
   componentDidMount() {

@@ -124,7 +124,7 @@ packageConfig = {
   dir: "."
   out: "dist"
   arch: "x64"
-  version: "0.34.0"
+  version: "1.4.8"
   prune: true
   ignore: new RegExp("(^\/node_modules\/(?!#{INCLUDE_MODULES.join("|")}).*|gulpfile\.coffee|^/dist/.*|^/src/.*|^/sass/.*|.*\.js\.map$)")
   asar: true
