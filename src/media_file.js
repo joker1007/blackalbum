@@ -384,7 +384,7 @@ class ArchiveFile extends MediaFile {
 
   async __getImageEntries(count) {
     const data = await readFile(this.fullpath);
-    const zip = new JSZip(data);
+    const zip = await JSZip.loadAsync(data);
     const imageEntries = zip.filter((relativePath, zo) => {
       return _.includes(IMAGE_EXTENSIONS, path.extname(relativePath).substr(1))
     });
@@ -410,7 +410,8 @@ class ArchiveFile extends MediaFile {
       if (!force && hasThumbnail)
         return;
 
-      const blob = new Blob([target.asArrayBuffer()], {type: this.getMimeType(target.name)});
+      const arrayBuf = await target.async("arraybuffer")
+      const blob = new Blob([arrayBuf], {type: this.getMimeType(target.name)});
       const blobUrl = global.URL.createObjectURL(blob);
       const canvas = await loadImagePromisified(blob, {canvas: true});
       global.URL.revokeObjectURL(blobUrl);
