@@ -49,7 +49,7 @@ export default class Config {
   }
 
   getAllCommands(extname: string): {[key: string]: string} {
-    return _.pick(this.players, (cmd, name) => (_.includes(this.extensions[extname], name)))
+    return _.pickBy(this.players, (cmd, name) => (_.includes(this.extensions[extname], name)))
   }
 
   getCommand(extname: string): string {
