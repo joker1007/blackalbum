@@ -4,11 +4,18 @@ import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
 import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
-import { TextField, SelectField, FontIcon, IconButton, Dialog, FlatButton } from 'material-ui';
+import { TextField, SelectField, MenuItem, FontIcon, IconButton, Dialog, FlatButton } from 'material-ui';
 import SearchTextField from './search_text_field';
 import SearchPresetItem from './search_preset';
 
 export default class Header extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      saveSearchDialogOpen: false
+    };
+  }
+
   render(): any {
     let {
       searchKeyword,
@@ -24,17 +31,6 @@ export default class Header extends Component {
       historyForward,
       deleteSearchPresetHandler,
     } = this.props;
-
-    const options = [
-      {value: FILENAME_ASC, label: 'ファイル名 (昇順)'},
-      {value: FILENAME_DESC, label: 'ファイル名 (降順)'},
-      {value: FULLPATH_ASC, label: 'フルパス (昇順)'},
-      {value: FULLPATH_DESC, label: 'フルパス (降順)'},
-      {value: FILESIZE_ASC, label: 'ファイルサイズ (昇順)'},
-      {value: FILESIZE_DESC, label: 'ファイルサイズ (降順)'},
-      {value: CTIME_ASC, label: '作成時 (昇順)'},
-      {value: CTIME_DESC, label: '作成時 (降順)'},
-    ];
 
     const updatingArea = updating ?
       <div className="updating">
@@ -82,10 +78,16 @@ export default class Header extends Component {
         <SelectField
           style={selectFieldStyle}
           value={sortOrder}
-          valueMember="value"
-          displayMember="label"
-          menuItems={options}
-          onChange={sortSelectChangeHandler} />
+          onChange={sortSelectChangeHandler}>
+          <MenuItem value={FILENAME_ASC} primaryText="ファイル名 (昇順)" />
+          <MenuItem value={FILENAME_DESC} primaryText="ファイル名 (降順)" />
+          <MenuItem value={FULLPATH_ASC} primaryText="フルパス (昇順)" />
+          <MenuItem value={FULLPATH_DESC} primaryText="フルパス (降順)" />
+          <MenuItem value={FILESIZE_ASC} primaryText="ファイルサイズ (昇順)" />
+          <MenuItem value={FILESIZE_DESC} primaryText="ファイルサイズ (降順)" />
+          <MenuItem value={CTIME_ASC} primaryText="作成時 (昇順)" />
+          <MenuItem value={CTIME_DESC} primaryText="作成時 (降順)" />
+        </SelectField>
         <div className="file-count">
           {fileCount} files
         </div>
@@ -93,6 +95,9 @@ export default class Header extends Component {
 
         <Dialog
           ref="searchPresetDialog"
+          open={this.state.saveSearchDialogOpen}
+          modal={false}
+          onRequestClose={this.closeSearchPresetDialog.bind(this)}
           title="Search query presets">
           <ul className="collection">
             {searchPresetsList}
@@ -113,11 +118,11 @@ export default class Header extends Component {
   }
 
   openSearchPresetDialog() {
-    this.refs.searchPresetDialog.show();
+    this.setState({saveSearchDialogOpen: true});
   }
 
   closeSearchPresetDialog() {
-    this.refs.searchPresetDialog.dismiss();
+    this.setState({saveSearchDialogOpen: false});
   }
 
   onClickSaveSearchPreset() {

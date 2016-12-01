@@ -67,7 +67,7 @@ export default class Config {
       let globbed = await glob(path.join(dir, "**", `*.{${this.targetExtensions.join(",")}}`));
       for (let f of globbed) {
         let normalized = f.normalize();
-        let valid = _.all(this.filterWords, w => {
+        let valid = _.every(this.filterWords, w => {
           return !normalized.match(w);
         })
         if (valid) {

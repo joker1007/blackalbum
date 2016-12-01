@@ -2,11 +2,11 @@
 
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import ThemeManager from 'material-ui/lib/styles/theme-manager';
-import Colors from 'material-ui/lib/styles/colors';
-import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
-import DarkTheme from 'material-ui/lib/styles/raw-themes/dark-raw-theme';
-import { ThemeWrapper, Snackbar } from 'material-ui';
+import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { fade } from 'material-ui/utils/colorManipulator';
+import { Snackbar } from 'material-ui';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
@@ -31,41 +31,31 @@ import KeyHandler from './key_handler';
 import ContextMenu from './context_menu';
 import type MediaFile from '../media_file';
 
-const darkTheme = ThemeManager.getMuiTheme(DarkTheme);
-const customTheme = ThemeManager.modifyRawThemePalette(darkTheme, {
-  primary1Color: Colors.cyan700,
-  primary2Color: Colors.cyan700,
-  primary3Color: Colors.grey600,
-  accent1Color: Colors.pinkA200,
-  accent2Color: Colors.pinkA400,
-  accent3Color: Colors.pinkA100,
-  textColor: Colors.fullWhite,
+const customTheme = getMuiTheme(darkBaseTheme, {
+  primary1Color: '#0097a7',
+  primary2Color: '#0097a7',
+  primary3Color: '#00acc1',
+  accent1Color: '#ff4081',
+  accent2Color: '#f50057',
+  accent3Color: '#ff80ab',
+  textColor: 'rgba(255, 255, 255, 1)',
   alternateTextColor: '#303030',
   canvasColor: '#303030',
-  borderColor: ColorManipulator.fade(Colors.fullWhite, 0.3),
-  disabledColor: ColorManipulator.fade(Colors.fullWhite, 0.3)
+  borderColor: fade('rgba(255, 255, 255, 1)', 0.3),
+  disabledColor: fade('rgba(255, 255, 255, 1)', 0.3)
 });
 
 class Root extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      updatedFileNotificationOpen: false
+    };
+  }
+
   componentDidMount() {
     let { dispatch } = this.props;
     dispatch(listFiles());
-  }
-
-  componentDidUpdate() {
-    const { updatedFiles } = this.props;
-    const lastUpdatedFile = updatedFiles.last();
-    if (lastUpdatedFile) {
-      this.refs.updatedFileNotification.show();
-    } else {
-      setTimeout(() => { this.refs.updatedFileNotification.dismiss(); }, 3000);
-    }
-  }
-
-  getChildContext() {
-    return {
-      muiTheme: customTheme,
-    };
   }
 
   render() {
@@ -103,35 +93,39 @@ class Root extends Component {
     const updatedFileNotification = (
       <Snackbar
         ref="updatedFileNotification"
+        open={updating}
+        autoHideDuration={3000}
         message={updatedFileNotificationMessage} />
     );
 
     return (
-      <div>
-        <Header
-          searchKeyword={searchKeyword}
-          searchPresets={searchPresets}
-          sortOrder={sortOrder}
-          updateSearchKeyword={this.updateSearchKeyword.bind(this)}
-          sortSelectChangeHandler={this.changeSortOrder.bind(this)}
-          fileCount={files.size}
-          updating={updating}
-          updatingFiles={updatingFiles}
-          updatedFiles={updatedFiles}
-          historyBack={this.historyBack.bind(this)}
-          historyForward={this.historyForward.bind(this)}
-          saveSearchPresetHandler={this.saveSearchPresetHandler.bind(this)}
-          deleteSearchPresetHandler={this.deleteSearchPresetHandler.bind(this)}
-        />
-        <KeyHandler keyHandlers={keyHandlers} />
-        <AppMenu />
-        <ContextMenu {...this.props} />
-        <FileList
-          files={files}
-          selectedFiles={selectedFiles}
-          onClickHandler={this.selectFile.bind(this)} />
-        {updatedFileNotification}
-      </div>
+      <MuiThemeProvider muiTheme={customTheme}>
+        <div>
+          <Header
+            searchKeyword={searchKeyword}
+            searchPresets={searchPresets}
+            sortOrder={sortOrder}
+            updateSearchKeyword={this.updateSearchKeyword.bind(this)}
+            sortSelectChangeHandler={this.changeSortOrder.bind(this)}
+            fileCount={files.size}
+            updating={updating}
+            updatingFiles={updatingFiles}
+            updatedFiles={updatedFiles}
+            historyBack={this.historyBack.bind(this)}
+            historyForward={this.historyForward.bind(this)}
+            saveSearchPresetHandler={this.saveSearchPresetHandler.bind(this)}
+            deleteSearchPresetHandler={this.deleteSearchPresetHandler.bind(this)}
+          />
+          <KeyHandler keyHandlers={keyHandlers} />
+          <AppMenu />
+          <ContextMenu {...this.props} />
+          <FileList
+            files={files}
+            selectedFiles={selectedFiles}
+            onClickHandler={this.selectFile.bind(this)} />
+          {updatedFileNotification}
+        </div>
+      </MuiThemeProvider>
     );
   }
 
@@ -172,9 +166,9 @@ class Root extends Component {
     window.dispatchEvent(new Event('contextmenu'));
   }
 
-  changeSortOrder(ev) {
+  changeSortOrder(ev, index, value) {
     let { dispatch } = this.props;
-    dispatch(setSortOrder(ev.target.value));
+    dispatch(setSortOrder(value));
     document.querySelector(".entries").scrollTop = 0;
   }
 
@@ -275,10 +269,6 @@ Root.propTypes = {
     fullpath: PropTypes.string.isRequired,
     filesize: PropTypes.number,
   }),
-};
-
-Root.childContextTypes = {
-  muiTheme: React.PropTypes.object,
 };
 
 

@@ -187,7 +187,7 @@ export default class MediaFile extends Record({
       results.push(await fsAccess(this.thumbnailPath(i)));
     }
 
-    return _.all(results);
+    return _.every(results);
   }
 
   execute(commandName = null) {
