@@ -132,11 +132,27 @@ packageConfig = {
 }
 gulp.task 'package:mac', ['browserify', 'html'], (done) ->
   packager(_.extend({}, packageConfig, platform: "darwin"), (err, path) ->
-    done()
+    outputDir = path.join(path.dirname(output[0]), 'out')
+    outputArchive = path.join(outputDir, path.basename(output[0]))
+    childProcess.execFileSync('mkdir', ['-p', outputDir])
+    childProcess.execFile('tar', ['cvzf', outputArchive + '.tar.gz', output[0]], (error, stdout, stderr) ->
+      if (error)
+        console.error(stderr)
+
+      done()
+    )
   )
 gulp.task 'package:linux', ['browserify', 'html'], (done) ->
-  packager(_.extend({}, packageConfig, platform: "linux"), (err, path) ->
-    done()
+  packager(_.extend({}, packageConfig, platform: "linux"), (err, output) ->
+    outputDir = path.join(path.dirname(output[0]), 'out')
+    outputArchive = path.join(outputDir, path.basename(output[0]))
+    childProcess.execFileSync('mkdir', ['-p', outputDir])
+    childProcess.execFile('tar', ['cvzf', outputArchive + '.tar.gz', output[0]], (error, stdout, stderr) ->
+      if (error)
+        console.error(stderr)
+
+      done()
+    )
   )
 gulp.task 'package', ['package:mac', 'package:linux']
 
