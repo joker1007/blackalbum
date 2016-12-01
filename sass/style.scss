@@ -9,9 +9,9 @@ $collection-bg-color: #303030;
   font-weight: 400;
   src: local('Material Icons'),
     local('MaterialIcons-Regular'),
-    url(../font/MaterialIcons-Regular.woff) format('woff2'),
-    url(../font/MaterialIcons-Regular.woff) format('woff'),
-    url(../font/MaterialIcons-Regular.ttf) format('truetype');
+    url(../font/material-icons/MaterialIcons-Regular.woff) format('woff2'),
+    url(../font/material-icons/MaterialIcons-Regular.woff) format('woff'),
+    url(../font/material-icons/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 .material-icons {
