@@ -5,7 +5,7 @@ import _ from 'lodash';
 import type { Map as ImmutableMap, OrderedMap, List } from 'immutable';
 import type MediaFile from './media_file';
 import FileSeacher from './file_seacher';
-import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from './actions';
+import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC, RANDOM_ORDER } from './actions';
 
 export const filesSelector: (state: Object)         => List<MediaFile>         = state => state.present.get("files").toList();
 export const updatingSelector: (state: Object)      => boolean                 = state => state.present.get("updating");
@@ -43,6 +43,8 @@ const sortFiles = (files: OrderedMap, sortOrder: string) => {
       return files.sortBy(f => {return f.ctime});
     case CTIME_DESC:
       return files.sortBy(f => {return f.ctime}).reverse();
+    case RANDOM_ORDER:
+      return files.sortBy(f => {return Math.random()});
   }
 };
 

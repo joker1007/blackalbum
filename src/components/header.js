@@ -3,7 +3,7 @@
 import React, { Component, PropTypes } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
-import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC } from '../actions';
+import { FILENAME_ASC, FILENAME_DESC, FULLPATH_ASC, FULLPATH_DESC, FILESIZE_ASC, FILESIZE_DESC, CTIME_ASC, CTIME_DESC, RANDOM_ORDER } from '../actions';
 import { TextField, SelectField, MenuItem, FontIcon, IconButton, Dialog, FlatButton } from 'material-ui';
 import SearchTextField from './search_text_field';
 import SearchPresetItem from './search_preset';
@@ -87,6 +87,7 @@ export default class Header extends Component {
           <MenuItem value={FILESIZE_DESC} primaryText="ファイルサイズ (降順)" />
           <MenuItem value={CTIME_ASC} primaryText="作成時 (昇順)" />
           <MenuItem value={CTIME_DESC} primaryText="作成時 (降順)" />
+          <MenuItem value={RANDOM_ORDER} primaryText="ランダム" />
         </SelectField>
         <div className="file-count">
           {fileCount} files

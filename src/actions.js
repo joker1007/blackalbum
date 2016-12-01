@@ -37,6 +37,7 @@ export const FILESIZE_ASC  = 'FILESIZE_ASC';
 export const FILESIZE_DESC = 'FILESIZE_DESC';
 export const CTIME_ASC     = 'CTIME_ASC';
 export const CTIME_DESC    = 'CTIME_DESC';
+export const RANDOM_ORDER  = 'RANDOM_ORDER';
 
 
 export const listFiles = createAction(LIST_FILES, async () => {
