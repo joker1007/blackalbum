@@ -131,7 +131,7 @@ packageConfig = {
   "app-version": VERSION
 }
 gulp.task 'package:mac', ['browserify', 'html'], (done) ->
-  packager(_.extend({}, packageConfig, platform: "darwin"), (err, path) ->
+  packager(_.extend({}, packageConfig, platform: "darwin"), (err, output) ->
     outputDir = path.join(path.dirname(output[0]), 'out')
     outputArchive = path.join(outputDir, path.basename(output[0]))
     childProcess.execFileSync('mkdir', ['-p', outputDir])
