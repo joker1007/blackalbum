@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
-import { regenerateThumbnail } from '../actions';
+import { regenerateThumbnail, copyFullpath } from '../actions';
 
 let remote = global.require('electron').remote;
 let Menu = remote.Menu;
@@ -36,6 +36,18 @@ class ContextMenu extends Component {
         },
       }
     });
+
+    if (selectedFiles.count() == 1) {
+      template.push(
+        {type: 'separator'},
+        {
+          label: "Copy fullpath",
+          click(item, focusedWindow) {
+            dispatch(copyFullpath(selectedFirst));
+          },
+        }
+      )
+    }
 
     template.push(
       {type: 'separator'},

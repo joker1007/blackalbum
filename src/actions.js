@@ -5,6 +5,7 @@ import { createAction } from 'redux-actions';
 import _ from 'lodash';
 import MediaFile from './media_file.js';
 import PromisePool from 'es6-promise-pool';
+const { clipboard } = global.require('electron');
 
 /*
  * Action Names
@@ -21,6 +22,7 @@ export const SELECT_MULTI_FILES = 'SELECT_MULTI_FILES';
 export const REMOVE_FILE = 'REMOVE_FILE';
 export const SET_SORT_ORDER = 'SET_SORT_ORDER';
 export const REGENERATE_THUMBNAIL = 'REGENERATE_THUMBNAIL';
+export const COPY_FULLPATH = 'COPY_FULLPATH';
 export const FAVORITE = 'FAVORITE';
 export const SAVE_SEARCH_PRESET = 'SAVE_SEARCH_PRESET';
 export const DELETE_SEARCH_PRESET = 'DELETE_SEARCH_PRESET';
@@ -94,6 +96,10 @@ export const regenerateThumbnail = createAction(REGENERATE_THUMBNAIL, async sele
   return { selectedFiles: selectedFiles.map(f => (
     f.set("thumbnailVersion", f.thumbnailVersion + 1)
   )) };
+});
+
+export const copyFullpath = createAction(COPY_FULLPATH, selectedFile => {
+  clipboard.writeText(selectedFile.fullpath)
 });
 
 export const favorite = createAction(FAVORITE, async selectedFiles => {
