@@ -117,6 +117,10 @@ header {
   padding: 6px;
   margin-bottom: 2px;
 
+  &.notfound {
+    background-color: #AA4444 !important;
+  }
+
   &.selected {
     background-color: #666 !important;
   }

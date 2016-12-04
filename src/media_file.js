@@ -190,6 +190,10 @@ export default class MediaFile extends Record({
     return _.every(results);
   }
 
+  existsSync() {
+    return fs.existsSync(this.fullpath);
+  }
+
   execute(commandName = null) {
     let cmd, args = null;
 

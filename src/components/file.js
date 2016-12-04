@@ -32,6 +32,7 @@ class FileComponent extends Component {
       selected: this.selected,
       unselectable: true,
       favorited: file.favorited,
+      notfound: !file.existsSync(),
     });
     const entryStyle = {
       height: (Math.round(global.config.thumbnail.size / 4 * 3) + 30).toString() + "px",
@@ -125,7 +126,7 @@ class FileComponent extends Component {
         </div>
 
         <div className="entry--filename">
-          <a className="selectable" href="" onClick={this.execute.bind(this)}>{file.basename}</a>
+          <a className="selectable" href="" onClick={this.execute.bind(this)}>{file.basename}{file.existsSync() ? "" : " (not found)"}</a>
         </div>
       </Card>
     );
