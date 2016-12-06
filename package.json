@@ -34,6 +34,7 @@
     "es6-promise-pool": "^2.4.1",
     "event-stream": "^3.3.1",
     "fbjs": "^0.8.6",
+    "flow-bin": "^0.36.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.2",
     "gulp-concat": "^2.6.0",
